@@ -1,14 +1,17 @@
 const translation = {
   common: {
-    welcome: '欢迎使用',
+    welcome: '我是您可持续领域工作的智能助手，很高兴见到你!',
+    welcomeDesc: '我可以解答您在绿色金融、ESG相关的任何问题，并支持您更好开展学习与工作。',
     appUnavailable: '应用不可用',
     appUnkonwError: '应用不可用',
+    welcomeBigTitle: '我是您可持续领域工作的智能助手，很高兴见到你!',
+    welcomeSmallTitle: '我可以解答您在绿色金融、ESG相关的任何问题，并支持您更好开展学习与工作。',
   },
   chat: {
     newChat: '新对话',
     newChatDefaultName: '新的对话',
     openingStatementTitle: '对话开场白',
-    powerBy: 'Powered by',
+    powerBy: '1',
     prompt: '提示词',
     privatePromptConfigTitle: '对话设置',
     publicPromptConfigTitle: '对话前提示词',

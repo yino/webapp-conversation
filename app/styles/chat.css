@@ -1,0 +1,12 @@
+.chat-bg {
+    background-color: #f7f8f9;
+}
+
+.chat-nav-bg {
+    background-color: #e9ebf0;
+}
+
+.chat-welcome {
+    position: absolute;
+    bottom: 1rem;
+}
