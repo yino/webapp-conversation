@@ -1,6 +1,6 @@
 'use client'
-import type { FC } from 'react'
-import React, { useEffect, useState } from 'react'
+import type { FC, ForwardedRef } from 'react'
+import React, { useEffect, useState, useImperativeHandle, forwardRef } from 'react'
 import { useTranslation } from 'react-i18next'
 import TemplateVarPanel, { PanelTitle, VarOpBtnGroup } from '../value-panel'
 import FileUploaderInAttachmentWrapper from '../base/file-uploader-in-attachment'
@@ -26,7 +26,7 @@ export type IWelcomeProps = {
   onInputsChange: (inputs: Record<string, any>) => void
 }
 
-const Welcome: FC<IWelcomeProps> = ({
+const Welcome = forwardRef(({
   conversationName,
   hasSetInputs,
   isPublicVersion,
@@ -36,12 +36,13 @@ const Welcome: FC<IWelcomeProps> = ({
   canEditInputs,
   savedInputs,
   onInputsChange,
-}) => {
+}: IWelcomeProps, ref: ForwardedRef<{ handleChat: () => void }>) => {
   console.log(promptConfig)
   const { t } = useTranslation()
   const hasVar = promptConfig.prompt_variables.length > 0
   const [isFold, setIsFold] = useState<boolean>(true)
   const [inputs, setInputs] = useState<Record<string, any>>((() => {
+    console.log("hasSetInputs", hasSetInputs)
     if (hasSetInputs)
       return savedInputs
 
@@ -344,6 +345,10 @@ const Welcome: FC<IWelcomeProps> = ({
       </div>)
   }
 
+  useImperativeHandle(ref, () => ({
+    handleChat,
+  }));
+
   return (
     <div className='relative mobile:min-h-[48px] tablet:min-h-[64px]'>
       {hasSetInputs && renderHeader()}
@@ -389,6 +394,6 @@ const Welcome: FC<IWelcomeProps> = ({
       </div>
     </div >
   )
-}
+})
 
 export default React.memo(Welcome)

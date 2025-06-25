@@ -22,6 +22,7 @@ import AppUnavailable from '@/app/components/app-unavailable'
 import { API_KEY, APP_ID, APP_INFO, isShowPrompt, promptTemplate } from '@/config'
 import type { Annotation as AnnotationType } from '@/types/log'
 import { addFileInfos, sortAgentSorts } from '@/utils/tools'
+import Welcome from '@/app/components/welcome'
 
 export type IMainProps = {
   params: any
@@ -48,6 +49,8 @@ const Main: FC<IMainProps> = () => {
     detail: Resolution.low,
     transfer_methods: [TransferMethod.local_file],
   })
+
+  const welcomeRef = useRef<{ handleChat: () => void }>(null)
 
   useEffect(() => {
     if (APP_INFO?.title)
@@ -169,6 +172,7 @@ const Main: FC<IMainProps> = () => {
     // trigger handleConversationSwitch
     setCurrConversationId(id, APP_ID)
     hideSidebar()
+
   }
 
   /*
@@ -635,6 +639,11 @@ const Main: FC<IMainProps> = () => {
     notify({ type: 'success', message: t('common.api.success') })
   }
 
+  // 供 Sidebar 调用，触发 Welcome 的 handleChat
+  const handleWelcomeChat = () => {
+    welcomeRef.current?.handleChat()
+  }
+
   const renderSidebar = () => {
     if (!APP_ID || !APP_INFO || !promptConfig)
       return null
@@ -644,6 +653,10 @@ const Main: FC<IMainProps> = () => {
         onCurrentIdChange={handleConversationIdChange}
         currentId={currConversationId}
         copyRight={APP_INFO.copyright || APP_INFO.title}
+        onStartChat={handleStartChat}
+        newConversationInputs={newConversationInputs}
+        hasSetInputs={hasSetInputs}
+        handleWelcomeChat={handleWelcomeChat}
       />
     )
   }
@@ -705,6 +718,19 @@ const Main: FC<IMainProps> = () => {
                 </div>
               </div>)
           }
+          {/* Welcome 组件加 ref */}
+          <Welcome
+            ref={welcomeRef}
+            conversationName={conversationName}
+            hasSetInputs={hasSetInputs}
+            isPublicVersion={isShowPrompt}
+            siteInfo={APP_INFO}
+            promptConfig={promptConfig}
+            onStartChat={handleStartChat}
+            canEditInputs={canEditInputs}
+            savedInputs={currInputs as Record<string, any>}
+            onInputsChange={setCurrInputs}
+          />
         </div>
       </div>
     </div>
