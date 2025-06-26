@@ -143,7 +143,7 @@ const Chat: FC<IChatProps> = ({
       {/* PC */}
       <div className="h-full space-y-[30px]">
         {chatList.length === 0 && !isMobile ? (
-          <div className='pt-[36rem]'>
+          <div className='absolute bottom-20' style={{ width: "100%" }}>
             <div className='flex justify-around items-center py-2 text-xl font-medium text-gray-700 text-center bottom-10
 '>{t('app.common.welcome')}</div>
             <div className='flex justify-around items-center py-2 text-[0.8rem] font-medium text-gray-700  text-center'>{t('app.common.welcomeDesc')}</div>
