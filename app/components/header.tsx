@@ -34,7 +34,7 @@ const Header: FC<IHeaderProps> = ({
       {isMobile ? (
         <div className="flex items-center space-x-2">
         
-          <div className="text-sm text-green-800 font-bold">ESG助手-mandlab</div>
+          <div className="text-sm text-green-600 font-bold">ESG助手-mandlab</div>
         </div>
       ) : (
         <div></div>
