@@ -6,6 +6,7 @@ const translation = {
     appUnkonwError: '应用不可用',
     welcomeBigTitle: '我是您可持续领域工作的智能助手，很高兴见到你!',
     welcomeSmallTitle: '我可以解答您在绿色金融、ESG相关的任何问题，并支持您更好开展学习与工作。',
+    noLogin: '无权限访问，请先登录。',
   },
   chat: {
     newChat: '新对话',

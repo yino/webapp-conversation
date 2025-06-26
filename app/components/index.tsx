@@ -23,6 +23,7 @@ import { API_KEY, APP_ID, APP_INFO, isShowPrompt, promptTemplate } from '@/confi
 import type { Annotation as AnnotationType } from '@/types/log'
 import { addFileInfos, sortAgentSorts } from '@/utils/tools'
 import Welcome from '@/app/components/welcome'
+import { useSearchParams } from 'next/navigation'
 
 export type IMainProps = {
   params: any
@@ -30,6 +31,7 @@ export type IMainProps = {
 
 const Main: FC<IMainProps> = () => {
   const { t } = useTranslation()
+  const searchParams = useSearchParams()
   const media = useBreakpoints()
   const isMobile = media === MediaType.mobile
   const hasSetAppConfig = APP_ID && API_KEY
@@ -51,6 +53,15 @@ const Main: FC<IMainProps> = () => {
   })
 
   const welcomeRef = useRef<{ handleChat: () => void }>(null)
+
+  // 检查 token
+  const [hasToken, setHasToken] = useState<boolean>(true)
+  useEffect(() => {
+    const token = searchParams.get('token')
+    if (!token) {
+      setHasToken(false)
+    }
+  }, [searchParams])
 
   useEffect(() => {
     if (APP_INFO?.title)
@@ -659,6 +670,12 @@ const Main: FC<IMainProps> = () => {
         handleWelcomeChat={handleWelcomeChat}
       />
     )
+  }
+
+  if (!hasToken) {
+    return <div className="flex items-center justify-center h-screen text-2xl text-red-500">
+      {t('app.common.noLogin')}
+    </div>
   }
 
   if (appUnavailable)
