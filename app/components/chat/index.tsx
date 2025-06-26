@@ -137,28 +137,36 @@ const Chat: FC<IChatProps> = ({
     <div className={cn(!feedbackDisabled && 'px-3.5', 'h-full')}>
       {/* Chat List */}
       <div className="h-full space-y-[30px]">
-        {chatList.map((item) => {
-          if (item.isAnswer) {
-            const isLast = item.id === chatList[chatList.length - 1].id
-            return <Answer
-              key={item.id}
-              item={item}
-              feedbackDisabled={feedbackDisabled}
-              onFeedback={onFeedback}
-              isResponding={isResponding && isLast}
-              suggestionClick={suggestionClick}
-            />
-          }
-          return (
-            <Question
-              key={item.id}
-              id={item.id}
-              content={item.content}
-              useCurrentUserAvatar={useCurrentUserAvatar}
-              imgSrcs={(item.message_files && item.message_files?.length > 0) ? item.message_files.map(item => item.url) : []}
-            />
-          )
-        })}
+        {chatList.length === 0 ? (
+          <div className='pt-[36rem]'>
+            <div className='flex justify-around items-center py-2 text-xl font-medium text-gray-700 text-center bottom-10
+'>{t('app.common.welcome')}</div>
+            <div className='flex justify-around items-center py-2 text-[0.8rem] font-medium text-gray-700  text-center'>{t('app.common.welcomeDesc')}</div>
+          </div>
+        ) : (
+          chatList.map((item) => {
+            if (item.isAnswer) {
+              const isLast = item.id === chatList[chatList.length - 1].id
+              return <Answer
+                key={item.id}
+                item={item}
+                feedbackDisabled={feedbackDisabled}
+                onFeedback={onFeedback}
+                isResponding={isResponding && isLast}
+                suggestionClick={suggestionClick}
+              />
+            }
+            return (
+              <Question
+                key={item.id}
+                id={item.id}
+                content={item.content}
+                useCurrentUserAvatar={useCurrentUserAvatar}
+                imgSrcs={(item.message_files && item.message_files?.length > 0) ? item.message_files.map(item => item.url) : []}
+              />
+            )
+          })
+        )}
       </div>
       {
         !isHideSendInput && (

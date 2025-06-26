@@ -33,7 +33,7 @@ const Header: FC<IHeaderProps> = ({
       {/* 中间标题部分 */}
       {isMobile ? (
         <div className="flex items-center space-x-2">
-        
+
           <div className="text-sm text-green-800 font-bold">ESG助手-mandlab</div>
         </div>
       ) : (
