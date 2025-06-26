@@ -42,7 +42,7 @@ const Chat: FC<IChatProps> = ({
   isResponding,
   controlClearQuery,
   visionConfig,
-  isMobile = true
+  isMobile = false,
 }) => {
   const { t } = useTranslation()
   const { notify } = Toast
