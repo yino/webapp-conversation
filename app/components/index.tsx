@@ -714,6 +714,7 @@ const Main: FC<IMainProps> = () => {
                     isResponding={isResponding}
                     checkCanSend={checkCanSend}
                     visionConfig={visionConfig}
+                    isMobile={isMobile}
                   />
                 </div>
               </div>)
