@@ -3,9 +3,9 @@ import type { FC } from 'react'
 import { useTranslation } from 'react-i18next'
 import {
   ChatBubbleOvalLeftEllipsisIcon,
-  PencilSquareIcon,
 } from '@heroicons/react/24/outline'
 import { ChatBubbleOvalLeftEllipsisIcon as ChatBubbleOvalLeftEllipsisSolidIcon } from '@heroicons/react/24/solid'
+import { ChevronLeftIcon, ChevronRightIcon } from '@heroicons/react/24/outline'
 import Button from '@/app/components/base/button'
 import type { ConversationItem } from '@/types/app'
 
@@ -37,14 +37,19 @@ const Sidebar: FC<ISidebarProps> = ({
 }) => {
   const { t } = useTranslation()
   const [isMenuOpen, setIsMenuOpen] = useState(false)
-  const menuRef = useRef(null)
+  const [hidden, setHidden] = useState(false)
+  const menuRef = useRef<HTMLDivElement>(null)
 
   const toggleMenu = () => {
     setIsMenuOpen(!isMenuOpen)
   }
 
-  const handleClickOutside = (event) => {
-    if (menuRef.current && !menuRef.current.contains(event.target)) {
+  const toggleHidden = () => {
+    setHidden(!hidden)
+  }
+
+  const handleClickOutside = (event: MouseEvent) => {
+    if (menuRef.current && !menuRef.current.contains(event.target as Node)) {
       setIsMenuOpen(false)
     }
   }
@@ -56,46 +61,77 @@ const Sidebar: FC<ISidebarProps> = ({
     }
   }, [])
 
+  if (hidden) {
+    return (
+      <div
+        className="fixed top-22 left-4 z-50 hidden md:flex items-center justify-center w-10 h-10 bg-white border border-gray-300 rounded-md shadow cursor-pointer
+        transition-transform duration-300 hover:scale-110 hover:bg-gray-100"
+        onClick={toggleHidden}
+        aria-label={t('app.sidebar.expand')}
+        title={t('app.sidebar.expand')}
+      >
+        <ChevronRightIcon className="w-6 h-6 text-gray-600" />
+      </div>
+    )
+  }
+
   return (
     <div
-      className="shrink-0 flex flex-col overflow-y-auto chat-nav-bg pc:w-[244px] tablet:w-[192px] mobile:w-[240px] border-r border-gray-200 tablet:h-[calc(100vh_-_3rem)] mobile:h-screen"
+      className="shrink-0 flex flex-col overflow-y-auto chat-nav-bg pc:w-[244px] tablet:w-[192px] mobile:w-[240px] border-r border-gray-200 tablet:h-[calc(100vh_-_3rem)] mobile:h-screen relative
+      transition-all duration-300 ease-in-out"
     >
-      <div className="flex justify-center items-center p-4 font-bold text-xl text-primary-900">
-        <img
-          src="/images/机器人.svg"
-          alt="Logo"
-          className="w-8 h-8 mr-2 mb-2"
-        />
-        ESG助手
+      {/* 顶部 Logo 和标题 */}
+      <div className="flex justify-between items-center p-4 font-bold text-xl text-primary-900">
+        <div className="flex items-center ml-5">
+          <img
+            src="/images/机器人.svg"
+            alt="Logo"
+            className="w-8 h-8 mr-2 mb-1"
+          />
+          ESG助手
+        </div>
+
+        {/* 隐藏按钮 */}
+        <button
+          onClick={toggleHidden}
+          className="text-gray-500 hover:text-gray-700 hidden md:flex items-center justify-center w-10 h-10 rounded-md
+          transition-transform duration-300 hover:scale-110"
+          aria-label={t('app.sidebar.collapse')}
+          title={t('app.sidebar.collapse')}
+        >
+          <ChevronLeftIcon className="w-6 h-6" />
+        </button>
       </div>
+
+      {/* 新对话按钮 */}
       {list.length < MAX_CONVERSATION_LENTH && (
         <div className="flex flex-shrink-0 p-4 !pb-0">
           <Button
             onClick={() => {
               onCurrentIdChange('-1');
-              console.log("newConversationInputs", newConversationInputs)
               if (newConversationInputs) onStartChat(newConversationInputs);
               handleWelcomeChat();
             }}
-            className="group block w-full flex-shrink-0 !justify-start !h-9 text-green-500 items-center text-sm bg-white pl-[4.7rem]">
+            className="group block w-full flex-shrink-0 !justify-start !h-9 text-green-500 items-center text-sm bg-white pl-[4.7rem]"
+          >
             {t('app.chat.newChat')}
           </Button>
         </div>
       )}
 
+      {/* 对话列表 */}
       <nav className="mt-4 flex-1 space-y-1 chat-nav-bg p-4 !pt-0">
         {list.map((item) => {
           const isCurrent = item.id === currentId
-          const ItemIcon
-            = isCurrent ? ChatBubbleOvalLeftEllipsisSolidIcon : ChatBubbleOvalLeftEllipsisIcon
+          const ItemIcon = isCurrent ? ChatBubbleOvalLeftEllipsisSolidIcon : ChatBubbleOvalLeftEllipsisIcon
           return (
             <div
               onClick={() => onCurrentIdChange(item.id)}
               key={item.id}
               className={classNames(
                 isCurrent
-                  ? 'bg-green-100 text-green-600' // 选中时背景为浅绿色，文本为绿色
-                  : 'text-gray-700 hover:bg-gray-100 hover:text-gray-700', // 默认情况下文本为灰色，悬停时背景为浅灰色
+                  ? 'bg-green-100 text-green-600'
+                  : 'text-gray-700 hover:bg-gray-100 hover:text-gray-700',
                 'group flex items-center rounded-md px-2 py-2 text-sm font-medium cursor-pointer',
               )}
             >
@@ -105,14 +141,12 @@ const Sidebar: FC<ISidebarProps> = ({
         })}
       </nav>
 
-      {/* 注释掉版权信息 */}
-      {/* <div className="flex flex-shrink-0 pr-4 pb-4 pl-4">
-        <div className="text-gray-400 font-normal text-xs">© {copyRight} {(new Date()).getFullYear()}</div>
-      </div> */}
-
+      {/* 展开菜单按钮 */}
       <button
         onClick={toggleMenu}
         className="fixed bottom-16 left-10 bg-gray-100 hover:bg-gray-200 active:bg-gray-300 text-gray-600 rounded-full w-10 h-10 flex items-center justify-center shadow-sm border border-gray-300"
+        aria-label={t('app.sidebar.menu')}
+        title={t('app.sidebar.menu')}
       >
         <svg
           xmlns="http://www.w3.org/2000/svg"
@@ -121,15 +155,11 @@ const Sidebar: FC<ISidebarProps> = ({
           stroke="currentColor"
           className="w-5 h-5"
         >
-          <path
-            strokeLinecap="round"
-            strokeLinejoin="round"
-            strokeWidth={2}
-            d="M4 6h16M4 12h16M4 18h16"
-          />
+          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6h16M4 12h16M4 18h16" />
         </svg>
       </button>
 
+      {/* 菜单内容 */}
       {isMenuOpen && (
         <div
           ref={menuRef}
@@ -152,13 +182,13 @@ const Sidebar: FC<ISidebarProps> = ({
             <span className="text-sm">0571-123124</span>
           </div>
           <div className="menu-item py-1 border-b border-gray-100">
-            <span className="text-sm">退出账号</span>
+            <span className="text-sm cursor-pointer hover:text-red-500">退出账号</span>
           </div>
           <div className="menu-item py-1 border-b border-gray-100">
-            <span className="text-sm">主题</span>
+            <span className="text-sm cursor-pointer hover:text-gray-700">主题</span>
           </div>
           <div className="menu-item py-1">
-            <span className="text-sm">关于我们</span>
+            <span className="text-sm cursor-pointer hover:text-gray-700">关于我们</span>
           </div>
         </div>
       )}
