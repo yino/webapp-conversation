@@ -37,12 +37,10 @@ const Welcome = forwardRef(({
   savedInputs,
   onInputsChange,
 }: IWelcomeProps, ref: ForwardedRef<{ handleChat: () => void }>) => {
-  console.log(promptConfig)
   const { t } = useTranslation()
   const hasVar = promptConfig.prompt_variables.length > 0
   const [isFold, setIsFold] = useState<boolean>(true)
   const [inputs, setInputs] = useState<Record<string, any>>((() => {
-    console.log("hasSetInputs", hasSetInputs)
     if (hasSetInputs)
       return savedInputs
 
@@ -54,6 +52,15 @@ const Welcome = forwardRef(({
     }
     return res
   })())
+  const shouldAutoChat = React.useRef(true)
+
+  useEffect(() => {
+    if (shouldAutoChat.current) {
+      handleChat()
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [])
+
   useEffect(() => {
     if (!savedInputs) {
       const res: Record<string, any> = {}
@@ -176,6 +183,7 @@ const Welcome = forwardRef(({
   }
 
   const canChat = () => {
+    if (!inputs || !promptConfig || !promptConfig.prompt_variables) return false;
     const inputLens = Object.values(inputs).length
     const promptVariablesLens = promptConfig.prompt_variables.length
     const emptyInput = inputLens < promptVariablesLens || Object.entries(inputs).filter(([k, v]) => {
