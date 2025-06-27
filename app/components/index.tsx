@@ -24,7 +24,9 @@ import type { Annotation as AnnotationType } from '@/types/log'
 import { addFileInfos, sortAgentSorts } from '@/utils/tools'
 import Welcome from '@/app/components/welcome'
 import { useSearchParams } from 'next/navigation'
+import GuidePage from '@/app/components/GuidePage'
 
+import PGuidePage from '@/app/components/PGuidePage'
 export type IMainProps = {
   params: any
 }
@@ -686,6 +688,8 @@ const Main: FC<IMainProps> = () => {
 
   return (
     <div className='bg-gray-100'>
+    <GuidePage isMobile={isMobile}/>
+   <PGuidePage isMobile={isMobile}/>
       <Header
         title={APP_INFO.title}
         isMobile={isMobile}
@@ -749,6 +753,8 @@ const Main: FC<IMainProps> = () => {
             savedInputs={currInputs as Record<string, any>}
             onInputsChange={setCurrInputs}
           />
+          
+                  
         </div>
       </div>
     </div>
