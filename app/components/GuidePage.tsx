@@ -7,12 +7,17 @@ export type GuidePageProps = {
 const GuidePage: React.FC<GuidePageProps> = ({ isMobile = false }) => {
   const overlayRef = useRef<HTMLDivElement>(null);
   const [step, setStep] = useState(1);
-  const [visible, setVisible] = useState(true); // 控制组件是否显示
+  const [visible, setVisible] = useState(() => {
+    // 检查localStorage中是否有hasSeenGuide标志，如果没有则显示引导页
+    const hasSeenGuide = localStorage.getItem('hasSeenGuide');
+    return hasSeenGuide !== 'true';
+  });
 
   useEffect(() => {
     const handleClickOutside = (e: MouseEvent) => {
       if (overlayRef.current && !overlayRef.current.contains(e.target as Node)) {
-        setVisible(false); // 关闭引导页
+        setVisible(false);
+        localStorage.setItem('hasSeenGuide', 'true'); // 设置标志，下次不再显示
       }
     };
 
@@ -56,6 +61,7 @@ const GuidePage: React.FC<GuidePageProps> = ({ isMobile = false }) => {
           onClick={(e) => {
             e.stopPropagation();
             setVisible(false);
+            localStorage.setItem('hasSeenGuide', 'true'); // 设置标志，下次不再显示
           }}
         >
           跳过
@@ -72,6 +78,7 @@ const GuidePage: React.FC<GuidePageProps> = ({ isMobile = false }) => {
           onClick={(e) => {
             e.stopPropagation();
             setVisible(false);
+            localStorage.setItem('hasSeenGuide', 'true'); // 设置标志，下次不再显示
           }}
         >
           开始体验
