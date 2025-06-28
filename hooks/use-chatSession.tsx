@@ -2,22 +2,18 @@
 
 import { createContext, useContext, useEffect, useState, ReactNode } from 'react';
 
-const TOKEN_STORAGE_KEY = 'chat-session';
+const TOKEN_STORAGE_KEY = 'chat-session-id:';
 
-
-export const getChatSession = (): string | null => {
+// 记录服务端已经保存过得
+export const isFirstChatSession = (id: string): string | boolean => {
     if (typeof window !== 'undefined') {
-        return localStorage.getItem(TOKEN_STORAGE_KEY);
+        return localStorage.getItem(TOKEN_STORAGE_KEY + id) === "1";
     }
-    return null;
+    return false;
 };
 
-export const setChatSession = (token: string | null): void => {
-    if (typeof window !== 'undefined') {
-        if (token) {
-            localStorage.setItem(TOKEN_STORAGE_KEY, token);
-        } else {
-            localStorage.removeItem(TOKEN_STORAGE_KEY);
-        }
+export const saveFristChatSession = (id: string | null): void => {
+    if (typeof window !== 'undefined' && id) {
+        localStorage.setItem(TOKEN_STORAGE_KEY + id, "1");
     }
-}; 
+};

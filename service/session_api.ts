@@ -14,6 +14,9 @@ export const getSessionApi = async (url: string, params?: Record<string, any>) =
     try {
         const fullUrl = buildFullUrl(url);
         const userToken = getStoredToken();
+        if (!userToken) {
+            return;
+        }
         const response = await axios.get(fullUrl, {
             params,
             headers: {
@@ -26,7 +29,15 @@ export const getSessionApi = async (url: string, params?: Record<string, any>) =
         }
         return response.data;
     } catch (error) {
-        console.error('GET 请求失败:', error);
+        // 处理 401 错误
+        if (error.response?.data?.code === 401) {
+            clearStoredToken();
+            Toast.notify({ type: 'error', message: 'Invalid token' });
+            // 跳转至登录页
+            setTimeout(() => {
+                window.location.href = '/';
+            }, 500);
+        }
         throw error;
     }
 };

@@ -14,7 +14,7 @@ export const getSessionList = async () => {
 
 // 查询对话
 export const getChatSession = async (id: string) => {
-    return getSessionApi(`conversation`, {})
+    return await getSessionApi(`conversation/${id}`, {})
 }
 
 // 处理数据 为了贴合easygf的格式
