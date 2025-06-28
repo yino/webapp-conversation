@@ -6,7 +6,6 @@ import Toast from '@/app/components/base/toast'
 
 // 拼接完整 URL
 const buildFullUrl = (url: string) => {
-    console.log(SESSION_API, SESSION_API_PREFIX, url)
     return `${SESSION_API}${SESSION_API_PREFIX}/${url}`;
 };
 
