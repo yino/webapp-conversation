@@ -44,6 +44,11 @@ export const fetchConversations = async () => {
   return get('conversations', { params: { limit: 100, first_id: '' } })
 }
 
+export const fetchMandlabConversations = async () => {
+  return get('conversations/mandlab', { params: { limit: 100, first_id: '' } })
+}
+
+
 export const fetchChatList = async (conversationId: string) => {
   return get('messages', { params: { conversation_id: conversationId, limit: 20, last_id: '' } })
 }

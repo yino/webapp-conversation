@@ -25,8 +25,9 @@ import { addFileInfos, sortAgentSorts } from '@/utils/tools'
 import Welcome from '@/app/components/welcome'
 import { useSearchParams } from 'next/navigation'
 import GuidePage from '@/app/components/GuidePage'
-
 import PGuidePage from '@/app/components/PGuidePage'
+import { setStoredToken, getStoredToken } from '@/hooks/use-token'
+import { bindChatSession } from '@/service/chat_session'
 export type IMainProps = {
   params: any
 }
@@ -60,8 +61,12 @@ const Main: FC<IMainProps> = () => {
   const [hasToken, setHasToken] = useState<boolean>(true)
   useEffect(() => {
     const token = searchParams.get('token')
-    if (!token) {
+    const cacheToken = getStoredToken()
+    if (!token && !cacheToken) {
       setHasToken(false)
+    } else {
+      if (token) setStoredToken(token)
+      setHasToken(true)
     }
   }, [searchParams])
 
@@ -244,10 +249,14 @@ const Main: FC<IMainProps> = () => {
       return
     }
     (async () => {
+      // 获取会话列表相关
       try {
+        bindChatSession("1231")
+
         const [conversationData, appParams] = await Promise.all([fetchConversations(), fetchAppParams()])
         // handle current conversation id
         const { data: conversations, error } = conversationData as { data: ConversationItem[]; error: string }
+        console.log("conversationData", conversationData)
         if (error) {
           Toast.notify({ type: 'error', message: error })
           throw new Error(error)
@@ -454,9 +463,12 @@ const Main: FC<IMainProps> = () => {
           responseItem.id = messageId
           hasSetResponseId = true
         }
-
-        if (isFirstMessage && newConversationId)
+        console.log("isFirstMessage", isFirstMessage, messageId, newConversationId)
+        if (isFirstMessage && newConversationId) {
           tempNewConversationId = newConversationId
+          // 首次则绑定会话
+          bindChatSession(newConversationId)
+        }
 
         setMessageTaskId(taskId)
         // has switched to other conversation
@@ -688,8 +700,8 @@ const Main: FC<IMainProps> = () => {
 
   return (
     <div className='bg-gray-100'>
-    <GuidePage isMobile={isMobile}/>
-   <PGuidePage isMobile={isMobile}/>
+      <GuidePage isMobile={isMobile} />
+      <PGuidePage isMobile={isMobile} />
       <Header
         title={APP_INFO.title}
         isMobile={isMobile}
@@ -753,8 +765,8 @@ const Main: FC<IMainProps> = () => {
             savedInputs={currInputs as Record<string, any>}
             onInputsChange={setCurrInputs}
           />
-          
-                  
+
+
         </div>
       </div>
     </div>
