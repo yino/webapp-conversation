@@ -27,7 +27,7 @@ import { useSearchParams } from 'next/navigation'
 import GuidePage from '@/app/components/GuidePage'
 import PGuidePage from '@/app/components/PGuidePage'
 import { setStoredToken, getStoredToken } from '@/hooks/use-token'
-import { bindChatSession } from '@/service/chat_session'
+import { bindChatSession, getSessionList, afterGetSessionList } from '@/service/chat_session'
 export type IMainProps = {
   params: any
 }
@@ -251,17 +251,18 @@ const Main: FC<IMainProps> = () => {
     (async () => {
       // 获取会话列表相关
       try {
-        bindChatSession("1231")
-
-        const [conversationData, appParams] = await Promise.all([fetchConversations(), fetchAppParams()])
+        // let [conversationData, appParams] = await Promise.all([fetchConversations(), fetchAppParams()])
+        const [conversationData, appParams] = await Promise.all([getSessionList(), fetchAppParams()])
         // handle current conversation id
-        const { data: conversations, error } = conversationData as { data: ConversationItem[]; error: string }
-        console.log("conversationData", conversationData)
-        if (error) {
-          Toast.notify({ type: 'error', message: error })
-          throw new Error(error)
-          return
-        }
+        // const { data: conversations, error } = conversationData as { data: ConversationItem[]; error: string }
+        // if (error) {
+        //   Toast.notify({ type: 'error', message: error })
+        //   throw new Error(error)
+        //   return
+        // }
+        // 新的会话列表
+        const conversations: ConversationItem[] = afterGetSessionList(conversationData)?.data
+
         const _conversationId = getConversationIdFromStorage(APP_ID)
         const currentConversation = conversations.find(item => item.id === _conversationId)
         const isNotNewConversation = !!currentConversation
@@ -466,8 +467,6 @@ const Main: FC<IMainProps> = () => {
         console.log("isFirstMessage", isFirstMessage, messageId, newConversationId)
         if (isFirstMessage && newConversationId) {
           tempNewConversationId = newConversationId
-          // 首次则绑定会话
-          bindChatSession(newConversationId)
         }
 
         setMessageTaskId(taskId)
@@ -486,11 +485,13 @@ const Main: FC<IMainProps> = () => {
       async onCompleted(hasError?: boolean) {
         if (hasError)
           return
-
+        console.log("getConversationIdChangeBecauseOfNew()", getConversationIdChangeBecauseOfNew())
         if (getConversationIdChangeBecauseOfNew()) {
           const { data: allConversations }: any = await fetchConversations()
-          const newItem: any = await generationConversationName(allConversations[0].id)
-
+          console.log(222)
+          const newItem: any = await generationConversationName(allConversations[0].id);
+          // 绑定会话
+          bindChatSession(allConversations[0].id, newItem.name);
           const newAllConversations = produce(allConversations, (draft: any) => {
             draft[0].name = newItem.name
           })
