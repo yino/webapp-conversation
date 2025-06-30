@@ -748,7 +748,7 @@ const Main: FC<IMainProps> = () => {
 
   if (!hasToken) {
     return <div className="flex items-center justify-center h-screen text-2xl text-red-500">
-      {t('app.common.noLogin')}
+      无权限访问，请先登录。
     </div>
   }
 

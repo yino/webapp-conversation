@@ -16,6 +16,7 @@ const nextConfig = {
     // https://nextjs.org/docs/api-reference/next.config.js/ignoring-typescript-errors
     ignoreBuildErrors: true,
   },
+  basePath: `${process.env.VITE_PUBLIC_PATH}`,
 }
 
 module.exports = nextConfig
