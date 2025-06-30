@@ -3,6 +3,7 @@ export const APP_ID = `${process.env.NEXT_PUBLIC_APP_ID}`
 export const API_KEY = `${process.env.NEXT_PUBLIC_APP_KEY}`
 export const API_URL = `${process.env.NEXT_PUBLIC_API_URL}`
 export const SESSION_API = `${process.env.NEXT_PUBLIC_SESSION_API_URL}`
+export const PUBLIC_PATH = `${process.env.NEXT_PUBLIC_PATH}`
 
 export const APP_INFO: AppInfo = {
   title: 'ESG助手',
@@ -15,7 +16,7 @@ export const APP_INFO: AppInfo = {
 export const isShowPrompt = false
 export const promptTemplate = 'I want you to act as a javascript console.'
 
-export const API_PREFIX = '/api'
+export const API_PREFIX = `${PUBLIC_PATH}/api`
 
 export const LOCALE_COOKIE_NAME = 'locale'
 
