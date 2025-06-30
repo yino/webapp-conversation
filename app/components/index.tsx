@@ -25,10 +25,8 @@ import { addFileInfos, sortAgentSorts } from '@/utils/tools'
 import Welcome from '@/app/components/welcome'
 import { useSearchParams } from 'next/navigation'
 import GuidePage from '@/app/components/GuidePage'
+
 import PGuidePage from '@/app/components/PGuidePage'
-import { setStoredToken, getStoredToken } from '@/hooks/use-token'
-import { bindChatSession, getSessionList, afterGetSessionList, getChatSession } from '@/service/chat_session'
-import { isFirstChatSession, saveFristChatSession } from '@/hooks/use-chatSession'
 export type IMainProps = {
   params: any
 }
@@ -57,23 +55,14 @@ const Main: FC<IMainProps> = () => {
   })
 
   const welcomeRef = useRef<{ handleChat: () => void }>(null)
-  // 保存定时器 ID
-  const intervalRef = useRef<NodeJS.Timeout | null>(null);
-  const isRequestPending = useRef(false); // 标志位（使用 ref 保证跨渲染周期一致性）
 
   // 检查 token
   const [hasToken, setHasToken] = useState<boolean>(true)
   useEffect(() => {
     const token = searchParams.get('token')
-    const cacheToken = getStoredToken()
-    if (!token && !cacheToken) {
+    if (!token) {
       setHasToken(false)
-    } else {
-      if (token) setStoredToken(token)
-      setHasToken(true)
     }
-
-    if (intervalRef.current) clearInterval(intervalRef.current);
   }, [searchParams])
 
   useEffect(() => {
@@ -255,20 +244,15 @@ const Main: FC<IMainProps> = () => {
       return
     }
     (async () => {
-      // 获取会话列表相关
       try {
-        // let [conversationData, appParams] = await Promise.all([fetchConversations(), fetchAppParams()])
-        const [conversationData, appParams] = await Promise.all([getSessionList(), fetchAppParams()])
+        const [conversationData, appParams] = await Promise.all([fetchConversations(), fetchAppParams()])
         // handle current conversation id
-        // const { data: conversations, error } = conversationData as { data: ConversationItem[]; error: string }
-        // if (error) {
-        //   Toast.notify({ type: 'error', message: error })
-        //   throw new Error(error)
-        //   return
-        // }
-        // 新的会话列表
-        const conversations: ConversationItem[] = afterGetSessionList(conversationData)?.data
-
+        const { data: conversations, error } = conversationData as { data: ConversationItem[]; error: string }
+        if (error) {
+          Toast.notify({ type: 'error', message: error })
+          throw new Error(error)
+          return
+        }
         const _conversationId = getConversationIdFromStorage(APP_ID)
         const currentConversation = conversations.find(item => item.id === _conversationId)
         const isNotNewConversation = !!currentConversation
@@ -470,64 +454,10 @@ const Main: FC<IMainProps> = () => {
           responseItem.id = messageId
           hasSetResponseId = true
         }
-        if (isFirstMessage && newConversationId) {
+
+        if (isFirstMessage && newConversationId)
           tempNewConversationId = newConversationId
-          // 客户端是否已缓存会话 若缓存则无需绑定
-          const handleSessionBinding = async (newConversationId) => {
-            try {
-              await getChatSession(newConversationId);
-              saveFristChatSession(newConversationId);
-              return;
-            } catch (error) {
-              if (error.response?.data?.code === 2001) {
-                startIntervalForNameGeneration(newConversationId);
-              }
-            }
-          };
-          // 定时获取会话名称 并绑定
-          const startIntervalForNameGeneration = (newConversationId) => {
-            intervalRef.current = setInterval(async () => {
-              await handleNameGeneration(newConversationId);
-            }, 3000);
-          };
-          // 获取逻辑
-          const handleNameGeneration = async (newConversationId) => {
-            if (isRequestPending.current) return;
-            isRequestPending.current = true;
-            try {
-              const newItem = await generationConversationName(newConversationId);
-              if (newItem.name) {
-                clearInterval(intervalRef.current);
-                intervalRef.current = null;
-                await handleSessionBindingAfterNameGeneration(newItem);
-              }
-            } catch (error) {
-              console.error("Request failed:", error);
-            } finally {
-              isRequestPending.current = false;
-            }
-          };
-          // 获取到名称后
-          const handleSessionBindingAfterNameGeneration = async (newItem) => {
-            await bindChatSession(newItem.id, newItem.name);
-            saveFristChatSession(newItem.id);
-            const conversationData = await getSessionList();
-            const allConversations: ConversationItem[] = afterGetSessionList(conversationData)?.data;
-            const newAllConversations = produce(allConversations, (draft: any) => {
-              draft[0].name = newItem.name;
-            });
-            setConversationList(newAllConversations as any);
-            setConversationIdChangeBecauseOfNew(false);
-            resetNewConversationInputs();
-            setChatNotStarted();
-            setCurrConversationId(tempNewConversationId, APP_ID, true);
-            setRespondingFalse();
-          };
-          // 执行上述逻辑
-          if (!isFirstChatSession(newConversationId)) {
-            handleSessionBinding(newConversationId);
-          }
-        }
+
         setMessageTaskId(taskId)
         // has switched to other conversation
         if (prevTempNewConversationId !== getCurrConversationId()) {
@@ -542,19 +472,17 @@ const Main: FC<IMainProps> = () => {
         })
       },
       async onCompleted(hasError?: boolean) {
-        console.log("onCompleted")
         if (hasError)
           return
-        // 此处return 上游无法返回 conversationId
+
         if (getConversationIdChangeBecauseOfNew()) {
-          // const { data: allConversations }: any = await fetchConversations()
-          // const newItem: any = await generationConversationName(allConversations[0].id);
-          // // 绑定会话
-          // bindChatSession(allConversations[0].id, newItem.name);
-          // const newAllConversations = produce(allConversations, (draft: any) => {
-          //   draft[0].name = newItem.name
-          // })
-          // setConversationList(newAllConversations as any)
+          const { data: allConversations }: any = await fetchConversations()
+          const newItem: any = await generationConversationName(allConversations[0].id)
+
+          const newAllConversations = produce(allConversations, (draft: any) => {
+            draft[0].name = newItem.name
+          })
+          setConversationList(newAllConversations as any)
         }
         setConversationIdChangeBecauseOfNew(false)
         resetNewConversationInputs()
@@ -760,12 +688,17 @@ const Main: FC<IMainProps> = () => {
 
   return (
     <div className='bg-gray-100'>
-      <GuidePage isMobile={isMobile} />
-      <PGuidePage isMobile={isMobile} />
+    <GuidePage isMobile={isMobile}/>
+   <PGuidePage isMobile={isMobile}/>
       <Header
         title={APP_INFO.title}
         isMobile={isMobile}
         onShowSideBar={showSidebar}
+        onStartChat={handleStartChat}
+        newConversationInputs={newConversationInputs}
+        onCurrentIdChange={handleConversationIdChange}
+        hasSetInputs={hasSetInputs}
+          handleWelcomeChat={handleWelcomeChat}
         onCreateNewChat={() => handleConversationIdChange('-1')}
       />
       <div className="flex rounded-t-2xl bg-white overflow-hidden">
@@ -825,8 +758,8 @@ const Main: FC<IMainProps> = () => {
             savedInputs={currInputs as Record<string, any>}
             onInputsChange={setCurrInputs}
           />
-
-
+          
+                  
         </div>
       </div>
     </div>
