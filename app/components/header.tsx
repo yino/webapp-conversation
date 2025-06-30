@@ -1,21 +1,36 @@
-import type { FC } from 'react'
-import React from 'react'
-import { Bars3Icon, PencilSquareIcon } from '@heroicons/react/24/solid'
-import AppIcon from '@/app/components/base/app-icon'
+import type { FC } from 'react';
+import React, { useState } from 'react';
+import { Bars3Icon, PencilSquareIcon } from '@heroicons/react/24/solid';
+import AppIcon from '@/app/components/base/app-icon';
 
 export type IHeaderProps = {
-  title: string
-  isMobile?: boolean
-  onShowSideBar?: () => void
-  onCreateNewChat?: () => void
-}
+  title: string;
+  isMobile?: boolean;
+  onShowSideBar?: () => void;
+  onCreateNewChat?: () => void;
+  onStartChat: (inputs: Record<string, any>) => void;
+  onCurrentIdChange: (id: string) => void;
+  newConversationInputs: Record<string, any> | null;
+  hasSetInputs: boolean;
+  handleWelcomeChat: () => void;
+};
 
 const Header: FC<IHeaderProps> = ({
   title,
   isMobile,
   onShowSideBar,
+  handleWelcomeChat,
   onCreateNewChat,
+  onCurrentIdChange,
+  onStartChat,
+  newConversationInputs,
 }) => {
+  const handleClick = () => {
+    onCurrentIdChange('-1');
+    if (newConversationInputs) onStartChat(newConversationInputs);
+    handleWelcomeChat();
+  };
+
   return (
     <div className="shrink-0 flex items-center justify-between h-12 px-3 bg-green-50 chat-nav-bg">
       {/* 左侧菜单图标 */}
@@ -24,7 +39,7 @@ const Header: FC<IHeaderProps> = ({
           className="flex items-center justify-center h-10 w-10 cursor-pointer rounded-full hover:bg-green-100"
           onClick={() => onShowSideBar?.()}
         >
-          <Bars3Icon className="h-5 w-5 ml-4 text-green-700" />
+          <Bars3Icon className="h-5 w-5 ml-1 text-green-700" />
         </div>
       ) : (
         <div></div>
@@ -33,8 +48,6 @@ const Header: FC<IHeaderProps> = ({
       {/* 中间标题部分 */}
       {isMobile ? (
         <div className="flex items-center space-x-2">
-
-          
           <div className="text-sm text-green-600 font-bold">ESG助手-mandlab</div>
         </div>
       ) : (
@@ -44,16 +57,16 @@ const Header: FC<IHeaderProps> = ({
       {/* 右侧创建新对话图标 */}
       {isMobile ? (
         <div
-          className="flex items-center justify-center h-10 w-10 cursor-pointer rounded-full hover:bg-green-100"
-          onClick={() => onCreateNewChat?.()}
+          className={`flex items-center justify-center h-10 w-10 cursor-pointer rounded-full hover:bg-green-100`}
+          onClick={handleClick}
         >
-          <PencilSquareIcon className="h-5 w-5 mr-3 text-green-700" />
+          <PencilSquareIcon className="h-5 w-5 mr-1 text-green-700" />
         </div>
       ) : (
         <div></div>
       )}
     </div>
-  )
-}
+  );
+};
 
-export default React.memo(Header)
+export default React.memo(Header);

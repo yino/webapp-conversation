@@ -762,12 +762,17 @@ const Main: FC<IMainProps> = () => {
     <div className='bg-gray-100'>
       <GuidePage isMobile={isMobile} />
       <PGuidePage isMobile={isMobile} />
-      <Header
-        title={APP_INFO.title}
-        isMobile={isMobile}
-        onShowSideBar={showSidebar}
-        onCreateNewChat={() => handleConversationIdChange('-1')}
-      />
+   <Header
+     title={APP_INFO.title}
+     isMobile={isMobile}
+     onShowSideBar={showSidebar}
+     onStartChat={handleStartChat}
+     newConversationInputs={newConversationInputs}
+     onCurrentIdChange={handleConversationIdChange}
+     hasSetInputs={hasSetInputs}
+       handleWelcomeChat={handleWelcomeChat}
+     onCreateNewChat={() => handleConversationIdChange('-1')}
+   />
       <div className="flex rounded-t-2xl bg-white overflow-hidden">
         {/* sidebar */}
         {!isMobile && renderSidebar()}
