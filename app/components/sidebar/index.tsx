@@ -16,6 +16,7 @@ function classNames(...classes: any[]) {
 const MAX_CONVERSATION_LENTH = 20
 
 export type ISidebarProps = {
+  isMobile?: boolean;
   copyRight: string
   currentId: string
   onCurrentIdChange: (id: string) => void
@@ -24,9 +25,11 @@ export type ISidebarProps = {
   newConversationInputs: Record<string, any> | null
   hasSetInputs: boolean
   handleWelcomeChat: () => void
+  onShowSettings: () => void; // 新增的回调函数
 }
 
 const Sidebar: FC<ISidebarProps> = ({
+  isMobile,
   copyRight,
   currentId,
   onCurrentIdChange,
@@ -34,6 +37,7 @@ const Sidebar: FC<ISidebarProps> = ({
   onStartChat,
   newConversationInputs,
   handleWelcomeChat,
+  onShowSettings, // 新增的回调函数
 }) => {
   const { t } = useTranslation()
   const [isMenuOpen, setIsMenuOpen] = useState(false)
@@ -70,7 +74,11 @@ const Sidebar: FC<ISidebarProps> = ({
         aria-label={t('app.sidebar.expand')}
         title={t('app.sidebar.expand')}
       >
-        <ChevronRightIcon className="w-6 h-6 text-gray-600" />
+        <img
+          src="/images/menu2.svg"
+          alt="Logo"
+          className="w-5 h-5 "
+        />
       </div>
     )
   }
@@ -81,30 +89,41 @@ const Sidebar: FC<ISidebarProps> = ({
       transition-all duration-300 ease-in-out"
     >
       {/* 顶部 Logo 和标题 */}
-      <div className="flex justify-between items-center p-4 font-bold text-xl text-primary-900">
-        <div className="flex items-center ml-5">
-          <img
-            src="/images/机器人.svg"
-            alt="Logo"
-            className="w-8 h-8 mr-2 mb-1"
-          />
-          ESG助手
+      {!isMobile ? (
+        <div className="flex justify-between items-center p-4 font-bold text-xl text-primary-900">
+          <div className="flex items-center ml-5">
+            <img
+              src="/images/robot.svg"
+              alt="Logo"
+              className="w-8 h-8 mr-2 mb-1"
+            />
+            ESG助手
+          </div>
+
+          {/* 隐藏按钮 */}
+          <button
+            onClick={toggleHidden}
+            className="text-gray-500 hover:text-gray-700 hidden md:flex items-center justify-center w-10 h-10 rounded-md
+            transition-transform duration-300 hover:scale-110"
+            aria-label={t('app.sidebar.collapse')}
+            title={t('app.sidebar.collapse')}
+          >
+            <img
+              src="/images/menu.svg"
+              alt="Logo"
+              className="w-5 h-5 mr-2 mb-1"
+            />
+          </button>
         </div>
-
-        {/* 隐藏按钮 */}
-        <button
-          onClick={toggleHidden}
-          className="text-gray-500 hover:text-gray-700 hidden md:flex items-center justify-center w-10 h-10 rounded-md
-          transition-transform duration-300 hover:scale-110"
-          aria-label={t('app.sidebar.collapse')}
-          title={t('app.sidebar.collapse')}
-        >
-          <ChevronLeftIcon className="w-6 h-6" />
-        </button>
-      </div>
-
-      {/* 新对话按钮 */}
-      {list.length < MAX_CONVERSATION_LENTH && (
+      ) : (
+        <div className="flex justify-between items-center p-4 font-bold text-xl text-primary-900">
+          <div className="flex items-center ml-5">
+            历史对话
+          </div>
+        </div>
+      )}
+      
+      {!isMobile && list.length < MAX_CONVERSATION_LENTH && (
         <div className="flex flex-shrink-0 p-4 !pb-0">
           <Button
             onClick={() => {
@@ -141,23 +160,31 @@ const Sidebar: FC<ISidebarProps> = ({
         })}
       </nav>
 
-      {/* 展开菜单按钮 */}
-      <button
-        onClick={toggleMenu}
-        className="fixed bottom-16 left-10 bg-gray-100 hover:bg-gray-200 active:bg-gray-300 text-gray-600 rounded-full w-10 h-10 flex items-center justify-center shadow-sm border border-gray-300"
-        aria-label={t('app.sidebar.menu')}
-        title={t('app.sidebar.menu')}
-      >
-        <svg
-          xmlns="http://www.w3.org/2000/svg"
-          fill="none"
-          viewBox="0 0 24 24"
-          stroke="currentColor"
-          className="w-5 h-5"
+      {/* 底部区域 */}
+      {!isMobile ? (
+        // PC 端底部菜单按钮
+        <button
+          onClick={toggleMenu}
+          className="fixed bottom-16 left-10 bg-gray-100 hover:bg-gray-200 active:bg-gray-300 text-gray-600 rounded-full w-10 h-10 flex items-center justify-center shadow-sm border border-gray-300"
+          aria-label={t('app.sidebar.menu')}
+          title={t('app.sidebar.menu')}
         >
-          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6h16M4 12h16M4 18h16" />
-        </svg>
-      </button>
+          <img
+            src="/images/setup.svg"
+            alt="Logo"
+            className="w-5 h-5"
+          />
+        </button>
+      ) : (
+        // 移动端用户信息栏 - 添加点击事件
+        <div 
+          className="flex items-center justify-between bg-gray-100 p-3 rounded-lg cursor-pointer"
+          onClick={onShowSettings} // 添加点击事件
+        >
+          <div className="text-green-500 text-base font-normal">158****1234</div>
+          <div className="text-green-500 ">></div>
+        </div>
+      )}
 
       {/* 菜单内容 */}
       {isMenuOpen && (
