@@ -29,6 +29,12 @@ import PGuidePage from '@/app/components/PGuidePage'
 import { setStoredToken, getStoredToken } from '@/hooks/use-token'
 import { bindChatSession, getSessionList, afterGetSessionList, getChatSession } from '@/service/chat_session'
 import { isFirstChatSession, saveFristChatSession } from '@/hooks/use-chatSession'
+import SettingsPage from '@/app/components/SettingsPage'
+import { ChevronLeftIcon } from '@heroicons/react/20/solid'
+
+// +++ 添加类型定义 +++
+type DisplayMode = 'chat' | 'settings';
+
 export type IMainProps = {
   params: any
 }
@@ -39,6 +45,19 @@ const Main: FC<IMainProps> = () => {
   const media = useBreakpoints()
   const isMobile = media === MediaType.mobile
   const hasSetAppConfig = APP_ID && API_KEY
+
+  // +++ 添加状态控制显示模式 +++
+  const [displayMode, setDisplayMode] = useState<DisplayMode>('chat');
+  
+  // +++ 切换显示设置页面的函数 +++
+  const handleShowSettings = () => {
+    setDisplayMode('settings');
+  };
+
+  // +++ 切换回聊天界面的函数 +++
+  const handleBackToChat = () => {
+    setDisplayMode('chat');
+  };
 
   /*
   * app info
@@ -735,6 +754,7 @@ const Main: FC<IMainProps> = () => {
     return (
       <Sidebar
         list={conversationList}
+          isMobile={isMobile}
         onCurrentIdChange={handleConversationIdChange}
         currentId={currConversationId}
         copyRight={APP_INFO.copyright || APP_INFO.title}
@@ -742,6 +762,7 @@ const Main: FC<IMainProps> = () => {
         newConversationInputs={newConversationInputs}
         hasSetInputs={hasSetInputs}
         handleWelcomeChat={handleWelcomeChat}
+        onShowSettings={handleShowSettings} // +++ 传递回调函数 +++
       />
     )
   }
@@ -760,80 +781,86 @@ const Main: FC<IMainProps> = () => {
 
   return (
     <div className='bg-gray-100'>
-      <GuidePage isMobile={isMobile} />
-      <PGuidePage isMobile={isMobile} />
-   <Header
-     title={APP_INFO.title}
-     isMobile={isMobile}
-     onShowSideBar={showSidebar}
-     onStartChat={handleStartChat}
-     newConversationInputs={newConversationInputs}
-     onCurrentIdChange={handleConversationIdChange}
-     hasSetInputs={hasSetInputs}
-       handleWelcomeChat={handleWelcomeChat}
-     onCreateNewChat={() => handleConversationIdChange('-1')}
-   />
-      <div className="flex rounded-t-2xl bg-white overflow-hidden">
-        {/* sidebar */}
-        {!isMobile && renderSidebar()}
-        {isMobile && isShowSidebar && (
-          <div className='fixed inset-0 z-50'
-            style={{ backgroundColor: 'rgba(35, 56, 118, 0.2)' }}
-            onClick={hideSidebar}
-          >
-            <div className='inline-block' onClick={e => e.stopPropagation()}>
-              {renderSidebar()}
+      {/* +++ 根据显示模式渲染不同内容 +++ */}
+      {displayMode === 'settings' ? (
+   <SettingsPage onBack={handleBackToChat} />  
+      ) : (
+        // 聊天模式
+        <>
+          <GuidePage isMobile={isMobile} />
+          <PGuidePage isMobile={isMobile} />
+          <Header
+            title={APP_INFO.title}
+            isMobile={isMobile}
+            onShowSideBar={showSidebar}
+            onStartChat={handleStartChat}
+            newConversationInputs={newConversationInputs}
+            onCurrentIdChange={handleConversationIdChange}
+            hasSetInputs={hasSetInputs}
+            handleWelcomeChat={handleWelcomeChat}
+            onCreateNewChat={() => handleConversationIdChange('-1')}
+          />
+          <div className="flex rounded-t-2xl bg-white overflow-hidden">
+            {/* sidebar */}
+            {!isMobile && renderSidebar()}
+            {isMobile && isShowSidebar && (
+              <div className='fixed inset-0 z-50'
+                style={{ backgroundColor: 'rgba(35, 56, 118, 0.2)' }}
+                onClick={hideSidebar}
+              >
+                <div className='inline-block' onClick={e => e.stopPropagation()}>
+                  {renderSidebar()}
+                </div>
+              </div>
+            )}
+            {/* main */}
+            <div className='flex-grow flex flex-col h-[calc(100vh_-_3rem)] overflow-y-auto chat-bg'>
+              <ConfigSence
+                conversationName={conversationName}
+                hasSetInputs={hasSetInputs}
+                isPublicVersion={isShowPrompt}
+                siteInfo={APP_INFO}
+                promptConfig={promptConfig}
+                onStartChat={handleStartChat}
+                canEditInputs={canEditInputs}
+                savedInputs={currInputs as Record<string, any>}
+                onInputsChange={setCurrInputs}
+                visible={!hasSetInputs}
+              />
+
+              {
+                hasSetInputs && (
+                  <div className='relative grow h-[200px] pc:w-[794px] max-w-full mobile:w-full pb-[66px] mx-auto mb-3.5 overflow-hidden'>
+                    <div className='h-full overflow-y-auto' ref={chatListDomRef}>
+                      <Chat
+                        chatList={chatList}
+                        onSend={handleSend}
+                        onFeedback={handleFeedback}
+                        isResponding={isResponding}
+                        checkCanSend={checkCanSend}
+                        visionConfig={visionConfig}
+                        isMobile={isMobile}
+                      />
+                    </div>
+                  </div>)
+              }
+              {/* Welcome 组件加 ref */}
+              <Welcome
+                ref={welcomeRef}
+                conversationName={conversationName}
+                hasSetInputs={hasSetInputs}
+                isPublicVersion={isShowPrompt}
+                siteInfo={APP_INFO}
+                promptConfig={promptConfig}
+                onStartChat={handleStartChat}
+                canEditInputs={canEditInputs}
+                savedInputs={currInputs as Record<string, any>}
+                onInputsChange={setCurrInputs}
+              />
             </div>
           </div>
-        )}
-        {/* main */}
-        <div className='flex-grow flex flex-col h-[calc(100vh_-_3rem)] overflow-y-auto chat-bg'>
-          <ConfigSence
-            conversationName={conversationName}
-            hasSetInputs={hasSetInputs}
-            isPublicVersion={isShowPrompt}
-            siteInfo={APP_INFO}
-            promptConfig={promptConfig}
-            onStartChat={handleStartChat}
-            canEditInputs={canEditInputs}
-            savedInputs={currInputs as Record<string, any>}
-            onInputsChange={setCurrInputs}
-            visible={!hasSetInputs}
-          />
-
-          {
-            hasSetInputs && (
-              <div className='relative grow h-[200px] pc:w-[794px] max-w-full mobile:w-full pb-[66px] mx-auto mb-3.5 overflow-hidden'>
-                <div className='h-full overflow-y-auto' ref={chatListDomRef}>
-                  <Chat
-                    chatList={chatList}
-                    onSend={handleSend}
-                    onFeedback={handleFeedback}
-                    isResponding={isResponding}
-                    checkCanSend={checkCanSend}
-                    visionConfig={visionConfig}
-                    isMobile={isMobile}
-                  />
-                </div>
-              </div>)
-          }
-          {/* Welcome 组件加 ref */}
-          <Welcome
-            ref={welcomeRef}
-            conversationName={conversationName}
-            hasSetInputs={hasSetInputs}
-            isPublicVersion={isShowPrompt}
-            siteInfo={APP_INFO}
-            promptConfig={promptConfig}
-            onStartChat={handleStartChat}
-            canEditInputs={canEditInputs}
-            savedInputs={currInputs as Record<string, any>}
-            onInputsChange={setCurrInputs}
-          />
-
-
-        </div>
-      </div>
+        </>
+      )}
     </div>
   )
 }
