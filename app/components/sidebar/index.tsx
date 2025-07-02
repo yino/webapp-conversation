@@ -42,6 +42,7 @@ const Sidebar: FC<ISidebarProps> = ({
   const { t } = useTranslation()
   const [isMenuOpen, setIsMenuOpen] = useState(false)
   const [hidden, setHidden] = useState(false)
+  const [showLogoutConfirm, setShowLogoutConfirm] = useState(false) // 新增状态
   const menuRef = useRef<HTMLDivElement>(null)
 
   const toggleMenu = () => {
@@ -64,6 +65,23 @@ const Sidebar: FC<ISidebarProps> = ({
       document.removeEventListener('mousedown', handleClickOutside)
     }
   }, [])
+
+  const handleLogout = () => {
+    setShowLogoutConfirm(true) // 显示退出确认对话框
+  }
+
+  const confirmLogout = () => {
+    // 清除 login_token 缓存
+    localStorage.removeItem('login_token') 
+    // 关闭确认对话框
+    setShowLogoutConfirm(false)
+    window.location.href = process.env.NEXT_PUBLIC_LOGIN_URL|| '/web';
+    // 可以在这里添加跳转到登录页面等逻辑
+  }
+
+  const cancelLogout = () => {
+    setShowLogoutConfirm(false) // 关闭确认对话框
+  }
 
   if (hidden) {
     return (
@@ -209,7 +227,12 @@ const Sidebar: FC<ISidebarProps> = ({
             <span className="text-sm">0571-123124</span>
           </div>
           <div className="menu-item py-1 border-b border-gray-100">
-            <span className="text-sm cursor-pointer hover:text-red-500">退出账号</span>
+            <span
+              className="text-sm cursor-pointer hover:text-red-500"
+              onClick={handleLogout} // 添加点击事件
+            >
+              退出账号
+            </span>
           </div>
           <div className="menu-item py-1 border-b border-gray-100">
             <span className="text-sm cursor-pointer hover:text-gray-700">主题</span>
@@ -219,6 +242,34 @@ const Sidebar: FC<ISidebarProps> = ({
           </div>
         </div>
       )}
+
+      {/* 退出确认对话框 */}
+    {showLogoutConfirm && (
+      <div className="fixed inset-0 bg-black/70 backdrop-blur-sm flex items-center justify-center z-50 transition-opacity duration-300">
+        <div className="bg-white dark:bg-gray-800 rounded-2xl p-8 w-full max-w-md shadow-2xl transform transition-all duration-300 scale-95 animate-fade-in-up">
+          <div className="text-center mb-6">
+            
+            <h3 className="text-2xl font-bold text-gray-800 dark:text-white">确认退出账号？</h3>
+            <p className="mt-2 text-gray-500 dark:text-gray-300">您的账户将保持安全，下次需要重新登录</p>
+          </div>
+          
+          <div className="flex flex-col sm:flex-row gap-3 mt-6">
+            <button
+              className="px-6 py-3 flex-1 rounded-xl bg-gray-100 dark:bg-gray-700 text-gray-800 dark:text-gray-200 font-medium hover:bg-gray-200 dark:hover:bg-gray-600 transition-colors duration-200 focus:outline-none focus:ring-2 focus:ring-gray-400"
+              onClick={cancelLogout}
+            >
+              取消
+            </button>
+            <button
+              className="px-6 py-3 flex-1 rounded-xl bg-gradient-to-r from-red-500 to-orange-500 text-white font-medium hover:opacity-90 transition-all duration-200 shadow-md hover:shadow-lg transform hover:-translate-y-0.5 focus:outline-none focus:ring-2 focus:ring-red-300 flex items-center justify-center"
+              onClick={confirmLogout}
+            >
+              确认退出
+            </button>
+          </div>
+        </div>
+      </div>
+    )}
     </div>
   )
 }
