@@ -768,9 +768,11 @@ const Main: FC<IMainProps> = () => {
   }
 
   if (!hasToken) {
-    return <div className="flex items-center justify-center h-screen text-2xl text-red-500">
-      无权限访问，请先登录。
-    </div>
+       window.location.href = process.env.NEXT_PUBLIC_LOGIN_URL|| '/web';
+        return null;
+    // return <div className="flex items-center justify-center h-screen text-2xl text-red-500">
+    //   无权限访问，请先登录。
+    // </div>
   }
 
   if (appUnavailable)
