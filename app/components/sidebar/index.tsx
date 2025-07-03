@@ -109,13 +109,13 @@ const Sidebar: FC<ISidebarProps> = ({
       {/* 顶部 Logo 和标题 */}
       {!isMobile ? (
         <div className="flex justify-between items-center p-4 font-bold text-xl text-primary-900">
-          <div className="flex items-center ml-5">
+          <div className="flex items-center ml-1 text-sm">
             <img
               src="/images/robot.svg"
               alt="Logo"
-              className="w-8 h-8 mr-2 mb-1"
+              className="w-8 h-8 mr-1 mb-1"
             />
-            ESG助手
+            MandLab AI Agent
           </div>
 
           {/* 隐藏按钮 */}
@@ -212,7 +212,7 @@ const Sidebar: FC<ISidebarProps> = ({
         >
           <div className="menu-item flex justify-between items-center py-1 border-b border-gray-100">
             <span className="text-sm">手机号码</span>
-            <span className="text-sm">15890501234</span>
+            <span className="text-sm">15829090357</span>
           </div>
           <div className="menu-item flex justify-between items-center py-1 border-b border-gray-100">
             <span className="text-sm">邀请码</span>
@@ -234,9 +234,7 @@ const Sidebar: FC<ISidebarProps> = ({
               退出账号
             </span>
           </div>
-          <div className="menu-item py-1 border-b border-gray-100">
-            <span className="text-sm cursor-pointer hover:text-gray-700">主题</span>
-          </div>
+ 
           <div className="menu-item py-1">
             <span className="text-sm cursor-pointer hover:text-gray-700">关于我们</span>
           </div>
@@ -248,7 +246,6 @@ const Sidebar: FC<ISidebarProps> = ({
       <div className="fixed inset-0 bg-black/70 backdrop-blur-sm flex items-center justify-center z-50 transition-opacity duration-300">
         <div className="bg-white dark:bg-gray-800 rounded-2xl p-8 w-full max-w-md shadow-2xl transform transition-all duration-300 scale-95 animate-fade-in-up">
           <div className="text-center mb-6">
-            
             <h3 className="text-2xl font-bold text-gray-800 dark:text-white">确认退出账号？</h3>
             <p className="mt-2 text-gray-500 dark:text-gray-300">您的账户将保持安全，下次需要重新登录</p>
           </div>
