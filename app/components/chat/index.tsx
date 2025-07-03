@@ -151,14 +151,10 @@ const Chat: FC<IChatProps> = ({
         <div className="h-full w-full space-y-[30px] overflow-y-auto overflow-x-hidden">
           {chatList.length === 0 && showWelcome && (
             <>
-              <div ref={welcomeRef} className="mb-10">
-                <h1 className="text-center text-2xl font-bold text-green-500 mb-4">
-                  我是您可持续领域工作的智能助手<br />很高兴见到你！
-                </h1>
-                <p className="text-center text-gray-500 mb-8">
-                  我可以解答您在绿色金融、ESG相关的问题任何，<br />并支持您更好开展学习与工作。
-                </p>
-              </div>
+             <div ref={welcomeRef} className="flex flex-col items-center justify-center h-full text-center">
+               <h1 className="text-xl font-bold text-green-500 mb-5">您好，我是MandLab，您随身的<br/>绿色金融与ESG工作智能助手</h1>
+               <p className="text-gray-500 mb-8">我还在努力学习成长中，目前的我可以为您解答<br />ESG报告框架和关键议题方案问题</p>
+             </div>
              {/* <div className="mb-5">
                 <p className="text-gray-500 mb-3">您可以问我这些问题：</p>
                 <div className="space-y-2">
@@ -273,7 +269,7 @@ const Chat: FC<IChatProps> = ({
               autoSize
             />
             <div className="absolute bottom-2 right-2 flex items-center h-8">
-              <div className={`${s.count} mr-4 h-5 leading-5 text-sm bg-gray-50 text-gray-500`}>{query.trim().length}</div>
+
               <Tooltip
                 selector='send-tip'
                 htmlContent={
