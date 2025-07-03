@@ -16,7 +16,7 @@ export const APP_INFO: AppInfo = {
 export const isShowPrompt = false
 export const promptTemplate = 'I want you to act as a javascript console.'
 
-export const API_PREFIX = `${PUBLIC_PATH}/api`
+export const API_PREFIX = `/chat-api`
 
 export const LOCALE_COOKIE_NAME = 'locale'
 

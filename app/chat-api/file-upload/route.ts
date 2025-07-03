@@ -1,5 +1,5 @@
 import { type NextRequest } from 'next/server'
-import { client, getInfo } from '@/app/api/utils/common'
+import { client, getInfo } from '@/app/chat-api/utils/common'
 
 export async function POST(request: NextRequest) {
   try {
