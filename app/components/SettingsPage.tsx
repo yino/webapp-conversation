@@ -124,29 +124,7 @@ const SettingsPage: FC<SettingsPageProps> = ({ onBack }) => {
           <span className="text-sm text-gray-900 font-medium">{inviteCode}</span>
         </div>
 
-        {/* 主题色 */}
-        <div className="flex justify-between items-center h-12 bg-gray-50 rounded-lg px-4 border border-gray-200">
-          <span className="text-sm text-gray-700">主题色</span>
-          <div className="flex space-x-2">
-            {themeOptions.map((opt) => (
-              <button
-                key={opt}
-                onClick={() => handleChangeTheme(opt)}
-                className={`
-                  w-8 h-8 flex items-center justify-center rounded-md
-                  ${currentTheme === opt 
-                    ? 'bg-green-100 border border-green-500' 
-                    : 'bg-white border border-gray-300 hover:bg-gray-100'}
-                `}
-                aria-label={`切换到 ${opt} 模式`}
-                title={`切换到 ${opt} 模式`}
-              >
-                {renderThemeIcon(opt)}
-              </button>
-            ))}
-          </div>
-        </div>
-
+    
         {/* 联系我们 */}
         <div className="flex justify-between items-center h-12 bg-gray-50 rounded-lg px-4 border border-gray-200">
           <span className="text-sm text-gray-700">联系我们</span>
