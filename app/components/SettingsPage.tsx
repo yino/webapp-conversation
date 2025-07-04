@@ -200,14 +200,6 @@ const SettingsPage: FC<SettingsPageProps> = ({ onBack }) => {
           <span className="text-sm text-gray-900 font-medium">{contactNumber}</span>
         </div>
 
-        {/* 关于我们 */}
-        <button
-          onClick={handleOpenAbout}
-          className="w-full text-left flex items-center h-12 bg-gray-50 rounded-lg px-4 border border-gray-200 hover:bg-gray-100"
-        >
-          <span className="text-sm text-gray-700">关于我们</span>
-        </button>
-        
         {/* 服务协议 */}
         <button
           onClick={() => setShowAgreement(true)}
