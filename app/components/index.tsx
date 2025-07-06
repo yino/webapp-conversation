@@ -48,7 +48,7 @@ const Main: FC<IMainProps> = () => {
 
   // +++ 添加状态控制显示模式 +++
   const [displayMode, setDisplayMode] = useState<DisplayMode>('chat');
-  
+
   // +++ 切换显示设置页面的函数 +++
   const handleShowSettings = () => {
     setDisplayMode('settings');
@@ -97,7 +97,7 @@ const Main: FC<IMainProps> = () => {
 
   useEffect(() => {
     if (APP_INFO?.title)
-      document.title = `${APP_INFO.title} - mandlab`
+      document.title = `${APP_INFO.title}`
   }, [APP_INFO?.title])
 
   // onData change thought (the produce obj). https://github.com/immerjs/immer/issues/576
@@ -754,7 +754,7 @@ const Main: FC<IMainProps> = () => {
     return (
       <Sidebar
         list={conversationList}
-          isMobile={isMobile}
+        isMobile={isMobile}
         onCurrentIdChange={handleConversationIdChange}
         currentId={currConversationId}
         copyRight={APP_INFO.copyright || APP_INFO.title}
@@ -768,8 +768,8 @@ const Main: FC<IMainProps> = () => {
   }
 
   if (!hasToken) {
-       window.location.href = process.env.NEXT_PUBLIC_LOGIN_URL|| '/web';
-        return null;
+    window.location.href = process.env.NEXT_PUBLIC_LOGIN_URL || '/web';
+    return null;
     // return <div className="flex items-center justify-center h-screen text-2xl text-red-500">
     //   无权限访问，请先登录。
     // </div>
@@ -785,7 +785,7 @@ const Main: FC<IMainProps> = () => {
     <div className='bg-gray-100'>
       {/* +++ 根据显示模式渲染不同内容 +++ */}
       {displayMode === 'settings' ? (
-   <SettingsPage onBack={handleBackToChat} />  
+        <SettingsPage onBack={handleBackToChat} />
       ) : (
         // 聊天模式
         <>

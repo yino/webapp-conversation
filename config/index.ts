@@ -6,7 +6,7 @@ export const SESSION_API = `${process.env.NEXT_PUBLIC_SESSION_API_URL}`
 export const PUBLIC_PATH = `${process.env.NEXT_PUBLIC_PATH}`
 
 export const APP_INFO: AppInfo = {
-  title: 'ESG助手',
+  title: 'MandLab研以致用',
   description: '',
   copyright: '',
   privacy_policy: '',
