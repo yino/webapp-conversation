@@ -1,5 +1,6 @@
 // src/app/components/SettingsPage.tsx
 import React, { FC, useState } from 'react'
+import {privacyPolicy, serviceAgreement} from '@/app/components/sidebar/policies.js';
 import {
   ComputerDesktopIcon,
   SunIcon,
@@ -19,7 +20,7 @@ const SettingsPage: FC<SettingsPageProps> = ({ onBack }) => {
   // 内置数据
   const phoneNumber = '158****1234'
   const inviteCode = '12345678'
-  const contactNumber = '0571-123124'
+  const contactNumber = '(0571) 8605 8021'
 
   // 主题状态
   const [currentTheme, setCurrentTheme] = useState<ThemeOption>('system')
@@ -112,29 +113,14 @@ const SettingsPage: FC<SettingsPageProps> = ({ onBack }) => {
       {/* 弹窗区域 */}
       {renderModal(
         '服务协议', 
-        '欢迎您使用MandLab研以致用服务！\n\n' +
-        '本协议是您与MandLab之间关于使用本服务所订立的协议。请在使用服务前仔细阅读本协议，特别是免除或者限制责任的条款。\n\n' +
-        '1. 服务内容\n' +
-        'MandLab为您提供专业的科研工具和服务，包括但不限于数据分析、实验设计等功能。\n\n' +
-        '2. 使用规则\n' +
-        '您在使用服务时需遵守国家法律法规，不得利用服务从事任何违法违规活动。\n\n' +
-        '3. 知识产权\n' +
-        '本服务所有内容的知识产权归MandLab所有，未经书面许可，不得擅自使用。',
+        serviceAgreement,
         showAgreement,
         () => setShowAgreement(false)
       )}
       
       {renderModal(
         '隐私政策', 
-        'MandLab研以致用（以下简称"我们"）非常重视用户隐私保护。本政策将帮助您了解：\n\n' +
-        '1. 我们收集哪些信息\n' +
-        '为提供服务，我们会收集您的设备信息、使用日志等必要信息。\n\n' +
-        '2. 信息使用方式\n' +
-        '收集的信息仅用于改进产品、提供服务和保障账户安全。\n\n' +
-        '3. 信息共享\n' +
-        '我们不会将您的个人信息出售给第三方，仅在法律要求或提供服务所必需时共享信息。\n\n' +
-        '4. 信息安全\n' +
-        '我们采用行业标准安全措施保护您的信息，但无法保证绝对安全。',
+        privacyPolicy,
         showPrivacy,
         () => setShowPrivacy(false)
       )}
