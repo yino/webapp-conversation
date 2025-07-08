@@ -4,12 +4,9 @@ import {
   ChatBubbleOvalLeftEllipsisIcon,
 } from '@heroicons/react/24/outline';
 import { ChatBubbleOvalLeftEllipsisIcon as ChatBubbleOvalLeftEllipsisSolidIcon } from '@heroicons/react/24/solid';
-import { ChevronLeftIcon, ChevronRightIcon } from '@heroicons/react/20/solid';
 import Button from '@/app/components/base/button';
-
-// 引入服务协议和隐私政策文件
-import {privacyPolicy,serviceAgreement} from '@/app/components/sidebar/policies.js';
-
+import { privacyPolicy, serviceAgreement } from '@/app/components/sidebar/policies.js';
+import { fetchUserInfo, UserInfo } from '@/app/components/userInfo.ts';
 
 function classNames(...classes: any[]) {
   return classes.filter(Boolean).join(' ');
@@ -45,66 +42,45 @@ const Sidebar: React.FC<ISidebarProps> = ({
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [isModalVisible, setIsModalVisible] = useState(false);
   const [modalTitle, setModalTitle] = useState('');
-  const [showLogoutConfirm, setShowLogoutConfirm] = useState(false) // 新增状态
   const [modalContent, setModalContent] = useState('');
+  const [userInfo, setUserInfo] = useState<UserInfo | null>(null);
   const menuRef = useRef<HTMLDivElement>(null);
-
-  const toggleMenu = () => {
+const toggleMenu = () => {
     setIsMenuOpen(!isMenuOpen);
   };
-
-  const handleClickOutside = (event: MouseEvent) => {
-    if (menuRef.current && !menuRef.current.contains(event.target as Node)) {
-      setIsMenuOpen(false);
-    }
-  };
-
   useEffect(() => {
-    document.addEventListener('mousedown', handleClickOutside);
+    document.addEventListener('mousedown', (event) => {
+      if (menuRef.current && !menuRef.current.contains(event.target as Node)) {
+        setIsMenuOpen(false);
+      }
+    });
+
     return () => {
-      document.removeEventListener('mousedown', handleClickOutside);
+      document.removeEventListener('mousedown', () => {});
     };
   }, []);
 
-  const handleLogout = () => {
-    setShowLogoutConfirm(true) // 显示退出确认对话框
-  }
+  useEffect(() => {
+    const getUser = async () => {
+      const info = await fetchUserInfo();
+      if (info) setUserInfo(info);
+    };
+    getUser();
+  }, []);
 
-  const showModal = (title: string, content: string) => {
-    setIsModalVisible(true);
-    setModalTitle(title);
-    setModalContent(content);
-  };
   const confirmLogout = () => {
-    // 清除 login_token 缓存
-    localStorage.removeItem('login_token') 
-    setShowLogoutConfirm(false)
-    window.location.href = process.env.NEXT_PUBLIC_LOGIN_URL|| '/web';
-   
-  }
-  const cancelLogout = () => {
-    setShowLogoutConfirm(false) 
-  }
-  const handleCancel = () => {
-    
-    setIsModalVisible(false);
-    
+    localStorage.removeItem('login_token');
+    window.location.href = process.env.NEXT_PUBLIC_LOGIN_URL || '/web';
   };
 
   return (
     <div className="shrink-0 flex flex-col overflow-y-auto chat-nav-bg pc:w-[244px] tablet:w-[192px] mobile:w-[240px] border-r border-gray-200 tablet:h-[calc(100vh_-_3rem)] mobile:h-screen relative transition-all duration-300 ease-in-out">
-      {!isMobile ? (
-        <div className="flex justify-between items-center p-4 font-bold text-xl text-primary-900">
-          <div className="flex items-center ml-1 text-sm">
-            <img src="/images/robot.svg" alt="Logo" className="w-8 h-8 mr-1 mb-1" />
-            MandLab AI Agent
-          </div>
+      <div className="flex justify-between items-center p-4 font-bold text-xl text-primary-900">
+        <div className="flex items-center ml-1 text-sm">
+          <img src="/images/robot.svg" alt="Logo" className="w-8 h-8 mr-1 mb-1" />
+          MandLab AI Agent
         </div>
-      ) : (
-        <div className="flex justify-between items-center p-4 font-bold text-xl text-primary-900">
-          <div className="flex items-center ml-5">历史对话</div>
-        </div>
-      )}
+      </div>
 
       {!isMobile && list.length < MAX_CONVERSATION_LENTH && (
         <div className="flex flex-shrink-0 p-4 !pb-0">
@@ -122,24 +98,21 @@ const Sidebar: React.FC<ISidebarProps> = ({
       )}
 
       <nav className="mt-4 flex-1 space-y-1 chat-nav-bg p-4 !pt-0">
-        {list.map((item) => {
-          const isCurrent = item.id === currentId;
-          return (
-            <div
-              onClick={() => onCurrentIdChange(item.id)}
-              key={item.id}
-              className={classNames(
-                isCurrent ? 'bg-green-100 text-green-600' : 'text-gray-700 hover:bg-gray-100 hover:text-gray-700',
-                'group flex items-center rounded-md px-2 py-2 text-sm font-medium cursor-pointer'
-              )}
-            >
-              {item.name}
-            </div>
-          );
-        })}
+        {list.map((item) => (
+          <div
+            onClick={() => onCurrentIdChange(item.id)}
+            key={item.id}
+            className={classNames(
+              item.id === currentId ? 'bg-green-100 text-green-600' : 'text-gray-700 hover:bg-gray-100 hover:text-gray-700',
+              'group flex items-center rounded-md px-2 py-2 text-sm font-medium cursor-pointer'
+            )}
+          >
+            {item.name}
+          </div>
+        ))}
       </nav>
 
-      {!isMobile ? (
+       {!isMobile ? (
         <button
           onClick={toggleMenu}
           className="fixed bottom-16 left-10 bg-gray-100 hover:bg-gray-200 active:bg-gray-300 text-gray-600 rounded-full w-10 h-10 flex items-center justify-center shadow-sm border border-gray-300"
@@ -153,96 +126,71 @@ const Sidebar: React.FC<ISidebarProps> = ({
           className="flex items-center justify-between bg-gray-100 p-3 rounded-lg cursor-pointer"
           onClick={onShowSettings}
         >
-          <div className="text-green-500 text-base font-normal">158****1234</div>
+          <div className="text-green-500 text-base font-normal">{userInfo?.phone || '无'}</div>
           <div className="text-green-500">></div>
         </div>
       )}
+
 
       {isMenuOpen && (
         <div ref={menuRef} className="fixed bottom-32 left-10 bg-white rounded-xl shadow-lg w-48 p-2">
           <div className="menu-item flex justify-between items-center py-1 border-b border-gray-100">
             <span className="text-sm">手机号码</span>
-            <span className="text-sm">15829090357</span>
+            <span className="text-sm">{userInfo?.phone || '无'}</span>
           </div>
           <div className="menu-item flex justify-between items-center py-1 border-b border-gray-100">
             <span className="text-sm">邀请码</span>
-            <span className="text-sm">12345678</span>
+            <span className="text-sm">{userInfo?.invite_code || '无'}</span>
           </div>
           <div className="menu-item flex justify-between items-center py-1 border-b border-gray-100">
             <span className="text-sm">剩余时间</span>
-            <span className="text-sm text-green-500">3天12小时</span>
+            <span className="text-sm text-green-500">{userInfo?.remaining_time_text || '无'}</span>
           </div>
-          <div className="menu-item flex justify-between items-center py-1 border-b border-gray-100">
-            <span className="text-sm">联系我们</span>
-            <span className="text-sm">0571-123124</span>
-          </div>
- <div className="menu-item py-1 border-b border-gray-100">
+          <div className="menu-item py-1 border-b border-gray-100">
             <span
               className="text-sm cursor-pointer hover:text-red-500"
-              onClick={handleLogout} // 添加点击事件
-            >
-              退出账号
-            </span>
+              onClick={confirmLogout}
+            >退出账号</span>
           </div>
           <div className="menu-item py-1 border-b border-gray-100">
-            <span className="text-sm cursor-pointer hover:text-red-500" onClick={() => showModal('服务协议', serviceAgreement)}>
-              服务协议
-            </span>
+            <span
+              className="text-sm cursor-pointer hover:text-red-500"
+              onClick={() => {
+                setModalTitle('服务协议');
+                setModalContent(serviceAgreement);
+                setIsModalVisible(true);
+              }}
+            >服务协议</span>
           </div>
           <div className="menu-item py-1 border-b border-gray-100">
-            <span className="text-sm cursor-pointer hover:text-red-500" onClick={() => showModal('隐私政策', privacyPolicy)}>
-              隐私政策
-            </span>
+            <span
+              className="text-sm cursor-pointer hover:text-red-500"
+              onClick={() => {
+                setModalTitle('隐私政策');
+                setModalContent(privacyPolicy);
+                setIsModalVisible(true);
+              }}
+            >隐私政策</span>
           </div>
         </div>
       )}
 
-      {/* 退出确认对话框 */}
-    {showLogoutConfirm && (
-      <div className="fixed inset-0 bg-black/70 backdrop-blur-sm flex items-center justify-center z-50 transition-opacity duration-300">
-        <div className="bg-white dark:bg-gray-800 rounded-2xl p-8 w-full max-w-md shadow-2xl transform transition-all duration-300 scale-95 animate-fade-in-up">
-          <div className="text-center mb-6">
-            <h3 className="text-2xl font-bold text-gray-800 dark:text-white">确认退出账号？</h3>
-            <p className="mt-2 text-gray-500 dark:text-gray-300">您的账户将保持安全，下次需要重新登录</p>
-          </div>
-          
-          <div className="flex flex-col sm:flex-row gap-3 mt-6">
-            <button
-              className="px-6 py-3 flex-1 rounded-xl bg-gray-100 dark:bg-gray-700 text-gray-800 dark:text-gray-200 font-medium hover:bg-gray-200 dark:hover:bg-gray-600 transition-colors duration-200 focus:outline-none focus:ring-2 focus:ring-gray-400"
-              onClick={cancelLogout}
-            >
-              取消
-            </button>
-            <button
-              className="px-6 py-3 flex-1 rounded-xl bg-gradient-to-r from-red-500 to-orange-500 text-white font-medium hover:opacity-90 transition-all duration-200 shadow-md hover:shadow-lg transform hover:-translate-y-0.5 focus:outline-none focus:ring-2 focus:ring-red-300 flex items-center justify-center"
-              onClick={confirmLogout}
-            >
-              确认退出
-            </button>
+      {isModalVisible && (
+        <div className="fixed inset-0 bg-black/70 backdrop-blur-sm flex items-center justify-center z-50">
+          <div className="bg-white dark:bg-gray-800 rounded-2xl p-8 w-full max-w-md shadow-2xl overflow-hidden">
+            <div className="text-center mb-6">
+              <h3 className="text-2xl font-bold text-gray-800 dark:text-white">{modalTitle}</h3>
+            </div>
+            <div className="max-h-[60vh] overflow-y-auto whitespace-pre-line text-gray-500 dark:text-gray-300" dangerouslySetInnerHTML={{ __html: modalContent }} />
+            <div className="mt-6 text-right">
+              <button
+                className="px-6 py-3 rounded-xl bg-gray-100 dark:bg-gray-700 text-gray-800 dark:text-gray-200 font-medium hover:bg-gray-200 dark:hover:bg-gray-600"
+                onClick={() => setIsModalVisible(false)}
+              >关闭</button>
+            </div>
           </div>
         </div>
-      </div>
-    )}
-     <div
-       className={`fixed inset-0 bg-black/70 backdrop-blur-sm flex items-center justify-center z-50 transition-opacity duration-300 ${
-         isModalVisible ? 'opacity-100' : 'opacity-0 pointer-events-none'
-       }`}
-     >
-       <div className="bg-white dark:bg-gray-800 rounded-2xl p-8 w-full max-w-md shadow-2xl transform transition-all duration-300 scale-95 animate-fade-in-up overflow-hidden">
-         <div className="text-center mb-6">
-           <h3 className="text-2xl font-bold text-gray-800 dark:text-white">{modalTitle}</h3>
-         </div>
-         <div className="max-h-[60vh] overflow-y-auto whitespace-pre-line text-gray-500 dark:text-gray-300" dangerouslySetInnerHTML={{ __html: modalContent }} />
-         <div className="mt-6 text-right">
-           <button
-             className="px-6 py-3 flex-1 rounded-xl bg-gray-100 dark:bg-gray-700 text-gray-800 dark:text-gray-200 font-medium hover:bg-gray-200 dark:hover:bg-gray-600 transition-colors duration-200 focus:outline-none focus:ring-2 focus:ring-gray-400"
-             onClick={handleCancel}
-           >
-             关闭
-           </button>
-         </div>
-       </div>
-     </div>
+      )}
     </div>
   );
 };
