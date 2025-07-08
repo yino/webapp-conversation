@@ -1,5 +1,5 @@
 // src/app/components/SettingsPage.tsx
-import React, { FC, useState } from 'react'
+import React, { FC, useEffect, useState } from 'react'
 import {privacyPolicy, serviceAgreement} from '@/app/components/sidebar/policies.js';
 import {
   ComputerDesktopIcon,
@@ -9,6 +9,7 @@ import {
   XMarkIcon
 } from '@heroicons/react/24/outline'
 import Button from '@/app/components/base/button'
+import { fetchUserInfo, UserInfo } from '@/app/components/userInfo.ts';
 
 type ThemeOption = 'system' | 'light' | 'dark'
 
@@ -43,6 +44,15 @@ const SettingsPage: FC<SettingsPageProps> = ({ onBack }) => {
   }
 
   const themeOptions: ThemeOption[] = ['system', 'light', 'dark']
+const [userInfo, setUserInfo] = useState<UserInfo | null>(null);
+
+useEffect(() => {
+  const loadUserInfo = async () => {
+    const info = await fetchUserInfo();
+    setUserInfo(info);
+  };
+  loadUserInfo();
+}, []);
 
   // 各按钮回调
   const handleChangeTheme = (opt: ThemeOption) => {
@@ -168,18 +178,18 @@ const SettingsPage: FC<SettingsPageProps> = ({ onBack }) => {
       </div>
 
       <div className="mt-4 space-y-2 px-4 flex-1 overflow-y-auto">
-        {/* 手机号码 */}
-        <div className="flex justify-between items-center h-12 bg-gray-50 rounded-lg px-4 border border-gray-200">
-          <span className="text-sm text-gray-700">手机号码</span>
-          <span className="text-sm text-gray-900 font-medium">{phoneNumber}</span>
-        </div>
-
-        {/* 邀请码 */}
-        <div className="flex justify-between items-center h-12 bg-gray-50 rounded-lg px-4 border border-gray-200">
-          <span className="text-sm text-gray-700">邀请码</span>
-          <span className="text-sm text-gray-900 font-medium">{inviteCode}</span>
-        </div>
-
+       {/* 手机号码 */}
+       <div className="flex justify-between items-center h-12 bg-gray-50 rounded-lg px-4 border border-gray-200">
+         <span className="text-sm text-gray-700">手机号码</span>
+         <span className="text-sm text-gray-900 font-medium">{userInfo?.phone || '无'}</span>
+       </div>
+       
+       {/* 邀请码 */}
+       <div className="flex justify-between items-center h-12 bg-gray-50 rounded-lg px-4 border border-gray-200">
+         <span className="text-sm text-gray-700">邀请码</span>
+         <span className="text-sm text-gray-900 font-medium">{userInfo?.invite_code || '无'}</span>
+       </div>
+       
         {/* 联系我们 */}
         <div className="flex justify-between items-center h-12 bg-gray-50 rounded-lg px-4 border border-gray-200">
           <span className="text-sm text-gray-700">联系我们</span>
