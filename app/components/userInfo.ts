@@ -1,0 +1,69 @@
+import axios from 'axios';
+
+export interface UserInfo {
+  phone: string;
+  invite_code: string;
+  remaining_seconds: number;
+  remaining_time_text: string; // 新增字段：格式化后时间字符串
+}
+
+const getLoginToken = (): string | null => {
+  return localStorage.getItem('login_token');
+};
+
+// 格式化时间（内部私有函数）
+const formatRemainingTime = (seconds: number): string => {
+  const days = Math.floor(seconds / (3600 * 24));
+  const hours = Math.floor((seconds % (3600 * 24)) / 3600);
+  const minutes = Math.floor((seconds % 3600) / 60);
+  const remainingSeconds = seconds % 60;
+
+  let timeString = '';
+  if (days > 0) {
+    timeString += `${days}天 `;
+  }
+  if (hours > 0 || days > 0) {
+    timeString += `${hours}小时 `;
+  }
+  if (minutes > 0 || hours > 0 || days > 0) {
+    timeString += `${minutes}分钟 `;
+  }
+  timeString += `${remainingSeconds}秒`;
+
+  return timeString.trim();
+};
+
+export const fetchUserInfo = async (): Promise<UserInfo | null> => {
+  const token = getLoginToken();
+  if (!token) {
+    console.error('未找到 login_token');
+    return null;
+  }
+
+  try {
+    const response = await axios.get('https://easygf-matcher-api-dev.nodebox.info/api/v1/auth/info', {
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+    });
+
+    const data = response.data;
+
+    if (data.code === 0 && data.data) {
+      const rawData = data.data;
+      const formatted: UserInfo = {
+        phone: rawData.phone || '',
+        invite_code: rawData.invite_code || '',
+        remaining_seconds: rawData.remaining_seconds || 0,
+        remaining_time_text: formatRemainingTime(rawData.remaining_seconds || 0),
+      };
+      return formatted;
+    } else {
+      console.error('返回异常:', data);
+      return null;
+    }
+  } catch (error) {
+    console.error('请求失败:', error);
+    return null;
+  }
+};
