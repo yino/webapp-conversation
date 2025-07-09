@@ -67,7 +67,11 @@ const toggleMenu = () => {
     };
     getUser();
   }, []);
-
+// 格式化手机号
+const formatPhone = (phone: string): string => {
+  // 保留手机号前 3 位和后 2 位，中间用星号替换
+  return phone.replace(/(\d{3})\d{4}(\d{2})/, '$1*****$2');
+};
   const confirmLogout = () => {
     localStorage.removeItem('login_token');
     window.location.href = process.env.NEXT_PUBLIC_LOGIN_URL || '/web';
@@ -126,7 +130,9 @@ const toggleMenu = () => {
           className="flex items-center justify-between bg-gray-100 p-3 rounded-lg cursor-pointer"
           onClick={onShowSettings}
         >
-          <div className="text-green-500 text-base font-normal">{userInfo?.phone || '无'}</div>
+         <div className="text-green-500 text-base font-normal">
+  {userInfo?.phone ? formatPhone(userInfo.phone) : '无'}
+</div>
           <div className="text-green-500">></div>
         </div>
       )}
