@@ -41,7 +41,8 @@ export const fetchUserInfo = async (): Promise<UserInfo | null> => {
   }
 
   try {
-    const response = await axios.get('https://easygf-matcher-api-dev.nodebox.info/api/v1/auth/info', {
+    const apiUrl = `${process.env.NEXT_PUBLIC_SESSION_API_URL}/api/v1/auth/info`; // 使用环境变量拼接 URL
+    const response = await axios.get(apiUrl, {
       headers: {
         Authorization: `Bearer ${token}`,
       },
