@@ -25,7 +25,11 @@ const SettingsPage: FC<SettingsPageProps> = ({ onBack }) => {
 
   // 主题状态
   const [currentTheme, setCurrentTheme] = useState<ThemeOption>('system')
-  
+  // 格式化手机号
+  const formatPhone = (phone: string): string => {
+    // 保留手机号前 3 位和后 2 位，中间用星号替换
+    return phone.replace(/(\d{3})\d{4}(\d{2})/, '$1*****$2');
+  };
   // 弹窗状态
   const [showLogoutConfirm, setShowLogoutConfirm] = useState(false)
   const [showAgreement, setShowAgreement] = useState(false)
@@ -181,7 +185,7 @@ useEffect(() => {
        {/* 手机号码 */}
        <div className="flex justify-between items-center h-12 bg-gray-50 rounded-lg px-4 border border-gray-200">
          <span className="text-sm text-gray-700">手机号码</span>
-         <span className="text-sm text-gray-900 font-medium">{userInfo?.phone || '无'}</span>
+         <span className="text-sm text-gray-900 font-medium"> {userInfo?.phone ? formatPhone(userInfo.phone) : '无'}</span>
        </div>
        
        {/* 邀请码 */}
