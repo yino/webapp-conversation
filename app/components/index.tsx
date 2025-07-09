@@ -31,6 +31,7 @@ import { bindChatSession, getSessionList, afterGetSessionList, getChatSession } 
 import { isFirstChatSession, saveFristChatSession } from '@/hooks/use-chatSession'
 import SettingsPage from '@/app/components/SettingsPage'
 import { ChevronLeftIcon } from '@heroicons/react/20/solid'
+import UsageTimeWarning from '@/app/components/UsageTimeWarning.tsx';
 
 // +++ 添加类型定义 +++
 type DisplayMode = 'chat' | 'settings';
@@ -782,6 +783,7 @@ const Main: FC<IMainProps> = () => {
     return <Loading type='app' />
 
   return (
+  
     <div className='bg-gray-100'>
       {/* +++ 根据显示模式渲染不同内容 +++ */}
       {displayMode === 'settings' ? (
@@ -791,6 +793,8 @@ const Main: FC<IMainProps> = () => {
         <>
           <GuidePage isMobile={isMobile} />
           <PGuidePage isMobile={isMobile} />
+          <UsageTimeWarning servicePhone="(0571) 8605 8021" />
+          
           <Header
             title={APP_INFO.title}
             isMobile={isMobile}
