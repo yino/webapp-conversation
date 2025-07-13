@@ -25,6 +25,7 @@ export type ISidebarProps = {
   hasSetInputs: boolean;
   handleWelcomeChat: () => void;
   onShowSettings: () => void;
+  isResponding?: boolean;
 };
 
 const Sidebar: React.FC<ISidebarProps> = ({
@@ -37,6 +38,7 @@ const Sidebar: React.FC<ISidebarProps> = ({
   newConversationInputs,
   handleWelcomeChat,
   onShowSettings,
+  isResponding,
 }) => {
   const { t } = useTranslation();
   const [isMenuOpen, setIsMenuOpen] = useState(false);
@@ -45,7 +47,7 @@ const Sidebar: React.FC<ISidebarProps> = ({
   const [modalContent, setModalContent] = useState('');
   const [userInfo, setUserInfo] = useState<UserInfo | null>(null);
   const menuRef = useRef<HTMLDivElement>(null);
-const toggleMenu = () => {
+  const toggleMenu = () => {
     setIsMenuOpen(!isMenuOpen);
   };
   useEffect(() => {
@@ -56,7 +58,7 @@ const toggleMenu = () => {
     });
 
     return () => {
-      document.removeEventListener('mousedown', () => {});
+      document.removeEventListener('mousedown', () => { });
     };
   }, []);
 
@@ -67,11 +69,11 @@ const toggleMenu = () => {
     };
     getUser();
   }, []);
-// 格式化手机号
-const formatPhone = (phone: string): string => {
-  // 保留手机号前 3 位和后 2 位，中间用星号替换
-  return phone.replace(/(\d{3})\d{4}(\d{2})/, '$1*****$2');
-};
+  // 格式化手机号
+  const formatPhone = (phone: string): string => {
+    // 保留手机号前 3 位和后 2 位，中间用星号替换
+    return phone.replace(/(\d{3})\d{4}(\d{2})/, '$1*****$2');
+  };
   const confirmLogout = () => {
     localStorage.removeItem('login_token');
     window.location.href = process.env.NEXT_PUBLIC_LOGIN_URL || '/web';
@@ -89,9 +91,10 @@ const formatPhone = (phone: string): string => {
       {!isMobile && list.length < MAX_CONVERSATION_LENTH && (
         <div className="flex flex-shrink-0 p-4 !pb-0">
           <Button
+            disabled={isResponding}
             onClick={() => {
               onCurrentIdChange('-1');
-              if (newConversationInputs) onStartChat(newConversationInputs);
+              // if (newConversationInputs) onStartChat(newConversationInputs);
               handleWelcomeChat();
             }}
             className="group block w-full flex-shrink-0 !justify-start !h-9 text-green-500 items-center text-sm bg-white pl-[4.7rem]"
@@ -104,11 +107,12 @@ const formatPhone = (phone: string): string => {
       <nav className="mt-4 flex-1 space-y-1 chat-nav-bg p-4 !pt-0">
         {list.map((item) => (
           <div
-            onClick={() => onCurrentIdChange(item.id)}
+            onClick={() => !isResponding && onCurrentIdChange(item.id)}
             key={item.id}
             className={classNames(
               item.id === currentId ? 'bg-green-100 text-green-600' : 'text-gray-700 hover:bg-gray-100 hover:text-gray-700',
-              'group flex items-center rounded-md px-2 py-2 text-sm font-medium cursor-pointer'
+              'group flex items-center rounded-md px-2 py-2 text-sm font-medium',
+              isResponding ? 'cursor-not-allowed opacity-50' : 'cursor-pointer'
             )}
           >
             {item.name}
@@ -116,7 +120,7 @@ const formatPhone = (phone: string): string => {
         ))}
       </nav>
 
-       {!isMobile ? (
+      {!isMobile ? (
         <button
           onClick={toggleMenu}
           className="fixed bottom-16 left-10 bg-gray-100 hover:bg-gray-200 active:bg-gray-300 text-gray-600 rounded-full w-10 h-10 flex items-center justify-center shadow-sm border border-gray-300"
@@ -130,9 +134,9 @@ const formatPhone = (phone: string): string => {
           className="flex items-center justify-between bg-gray-100 p-3 rounded-lg cursor-pointer"
           onClick={onShowSettings}
         >
-         <div className="text-green-500 text-base font-normal">
-  {userInfo?.phone ? formatPhone(userInfo.phone) : '无'}
-</div>
+          <div className="text-green-500 text-base font-normal">
+            {userInfo?.phone ? formatPhone(userInfo.phone) : '无'}
+          </div>
           <div className="text-green-500">></div>
         </div>
       )}

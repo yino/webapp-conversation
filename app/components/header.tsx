@@ -2,6 +2,10 @@ import type { FC } from 'react';
 import React, { useState } from 'react';
 import { Bars3Icon, PencilSquareIcon } from '@heroicons/react/24/solid';
 import AppIcon from '@/app/components/base/app-icon';
+import Toast from '@/app/components/base/toast';
+import { useTranslation } from 'react-i18next'
+
+const { notify } = Toast
 
 export type IHeaderProps = {
   title: string;
@@ -13,6 +17,7 @@ export type IHeaderProps = {
   newConversationInputs: Record<string, any> | null;
   hasSetInputs: boolean;
   handleWelcomeChat: () => void;
+  isResponding?: boolean;
 };
 
 const Header: FC<IHeaderProps> = ({
@@ -24,7 +29,9 @@ const Header: FC<IHeaderProps> = ({
   onCurrentIdChange,
   onStartChat,
   newConversationInputs,
+  isResponding,
 }) => {
+  const { t } = useTranslation()
   const handleClick = () => {
     onCurrentIdChange('-1');
     if (newConversationInputs) onStartChat(newConversationInputs);
@@ -58,7 +65,14 @@ const Header: FC<IHeaderProps> = ({
       {isMobile ? (
         <div
           className={`flex items-center justify-center h-10 w-10 cursor-pointer rounded-full hover:bg-green-100`}
-          onClick={handleClick}
+          onClick={() => {
+            console.log("click isResponding", isResponding)
+            if (isResponding) {
+              notify({ type: 'info', message: t('app.errorMessage.waitForResponse') })
+              return;
+            }
+            handleClick();
+          }}
         >
           <PencilSquareIcon className="h-5 w-5 mr-1 text-green-700" />
         </div>
