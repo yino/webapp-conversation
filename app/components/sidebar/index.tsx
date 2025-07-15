@@ -134,10 +134,10 @@ const Sidebar: React.FC<ISidebarProps> = ({
           className="flex items-center justify-between bg-gray-100 p-3 rounded-lg cursor-pointer"
           onClick={onShowSettings}
         >
-          <div className="text-green-500 text-base font-normal">
+          <div className="text-green-500 text-base font-normal mb-5">
             {userInfo?.phone ? formatPhone(userInfo.phone) : '无'}
           </div>
-          <div className="text-green-500">></div>
+          <div className="text-green-500 mb-5">></div>
         </div>
       )}
 
