@@ -154,7 +154,7 @@ const Sidebar: React.FC<ISidebarProps> = ({
           </div>
           <div className="menu-item flex justify-between items-center py-1 border-b border-gray-100">
             <span className="text-sm">剩余时间</span>
-            <span className="text-sm text-green-500">{userInfo?.remaining_time_text || '无'}</span>
+            <span className="text-xs text-green-500">{userInfo?.remaining_time_text || '无'}</span>
           </div>
           <div className="menu-item py-1 border-b border-gray-100">
             <span
