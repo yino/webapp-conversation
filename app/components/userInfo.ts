@@ -28,7 +28,7 @@ const formatRemainingTime = (seconds: number): string => {
   if (minutes > 0 || hours > 0 || days > 0) {
     timeString += `${minutes}分钟 `;
   }
-  timeString += `${remainingSeconds}秒`;
+  // timeString += `${remainingSeconds}秒`;
 
   return timeString.trim();
 };
