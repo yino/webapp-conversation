@@ -358,7 +358,7 @@ const Welcome = forwardRef(({
   }));
 
   return (
-    <div className='relative mobile:min-h-[48px] tablet:min-h-[64px]'>
+    <div className='relative tablet:min-h-[64px]'>
       {hasSetInputs && renderHeader()}
       <div className='mx-auto pc:w-[794px] max-w-full mobile:w-full px-3.5'>
         {/*  Has't set inputs  */}
