@@ -171,7 +171,7 @@ const Answer: FC<IAnswerProps> = ({
   return (
     <div key={id}>
       <div className='flex items-start'>
-        <div className={`${s.answerIcon} w-10 h-10 shrink-0 ${suggestedQuestions.length > 0 ? 'mt-10' : ''}`}>
+        <div className={`${s.answerIcon} w-10 h-10 shrink-0`}>
           {isResponding
             && <div className={s.typeingIcon}>
               <LoadingAnim type='avatar' />
@@ -180,7 +180,7 @@ const Answer: FC<IAnswerProps> = ({
         </div>
         <div className={`${s.answerWrap}`}>
           <div className={`${s.answer} relative text-sm text-gray-900`}>
-            <div className={`ml-2 py-3 px-4  bg-gray-100 rounded-tr-2xl rounded-b-2xl ${suggestedQuestions.length > 0 ? 'mt-10' : ''}`}>
+            <div className={`ml-2 py-3 px-4  bg-gray-100 rounded-tr-2xl rounded-b-2xl`}>
              {workflowProcess && (
                 <WorkflowProcess data={workflowProcess} hideInfo />
               )}
@@ -193,7 +193,6 @@ const Answer: FC<IAnswerProps> = ({
                 : (isAgentMode
                   ? agentModeAnswer
                   : (
-      
                     <Markdown content={content} />
                   ))}
               {suggestedQuestions.length > 0 && (
