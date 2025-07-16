@@ -24,7 +24,7 @@ const translation = {
     privacyPolicyRight: '。',
   },
   errorMessage: {
-    valueOfVarRequired: '变量值必填',
+    valueOfVarRequired: '请输入内容',
     waitForResponse: '请等待上条信息响应完成',
   },
   variableTable: {
