@@ -141,6 +141,7 @@ const Chat: FC<IChatProps> = ({
     <div className={cn(!feedbackDisabled && 'px-3.5', 'h-full w-full overflow-x-hidden')}>
       {/* Chat List */}
       {/* PC */}
+   
       {chatList.length === 0 && !isMobile ? (
         <div className='absolute bottom-20' style={{ width: "100%" }}>
           <div className='flex justify-around items-center py-2 text-xl font-medium text-gray-700 text-center bottom-10
@@ -208,6 +209,7 @@ const Chat: FC<IChatProps> = ({
         </div>
       ) : (
         <div className="h-full space-y-[30px]">
+       
           {chatList.map((item) => {
             if (item.isAnswer) {
               const isLast = item.id === chatList[chatList.length - 1].id
@@ -235,7 +237,7 @@ const Chat: FC<IChatProps> = ({
 
       {!isHideSendInput && (
         <div className={cn(!feedbackDisabled && '!left-3.5 !right-3.5', 'absolute z-10 bottom-0 left-0 right-0')}>
-          <div className='p-[5.5px] max-h-[150px] bg-white border-[1.5px] border-gray-200 rounded-xl overflow-y-auto'>
+<div className='p-[5.5px] max-h-[150px] bg-white border-[1.5px] border-gray-200 rounded-xl overflow-y-auto'>
             {visionConfig?.enabled && (
               <>
                 <div className='absolute bottom-2 left-2 flex items-center'>
@@ -257,11 +259,17 @@ const Chat: FC<IChatProps> = ({
                 </div>
               </>
             )}
-            <Textarea
+          <Textarea
               className={`
               block w-full px-2 pr-[118px] py-[7px] leading-5 max-h-none text-sm text-gray-700 outline-none appearance-none resize-none
               ${visionConfig?.enabled && 'pl-12'}
-            `}
+             font-size: 16px !important;  
+                -webkit-text-size-adjust: 100%;  
+                -webkit-fill-available;  `}
+                 style={{ 
+                    fontSize: '16px', 
+                    WebkitTextSizeAdjust: '100%' 
+                  }}
               value={query}
               onChange={handleContentChange}
               onKeyUp={handleKeyUp}
