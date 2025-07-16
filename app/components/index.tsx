@@ -101,7 +101,7 @@ const Main: FC<IMainProps> = () => {
       document.title = `${APP_INFO.title}`
   }, [APP_INFO?.title])
 
-  // onData change thought (the produce obj). https://github.com/immerjs/immer/issues/576
+  // onData change thought (the produce obj). https://github.com/immerjs/immer/issues/576 Read only property modification exception when using produce in setState in React 15.6.2 Read only property modification exception when using produce in setState in React 15.6.2  
   useEffect(() => {
     setAutoFreeze(false)
     return () => {
@@ -822,7 +822,7 @@ const Main: FC<IMainProps> = () => {
               </div>
             )}
             {/* main */}
-            <div className='flex-grow flex flex-col h-[calc(100vh_-_1rem)] overflow-y-auto '>
+            <div className='flex-grow flex flex-col h-[calc(100vh_-_3rem)] overflow-y-auto '>
               <ConfigSence
                 conversationName={conversationName}
                 hasSetInputs={hasSetInputs}
