@@ -822,7 +822,7 @@ const Main: FC<IMainProps> = () => {
               </div>
             )}
             {/* main */}
-            <div className='flex-grow flex flex-col h-[calc(100vh_-_3rem)] overflow-y-auto chat-bg'>
+            <div className='flex-grow flex flex-col h-[calc(100vh_-_4rem)] overflow-y-auto '>
               <ConfigSence
                 conversationName={conversationName}
                 hasSetInputs={hasSetInputs}
