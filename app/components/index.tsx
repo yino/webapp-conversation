@@ -746,7 +746,7 @@ const Main: FC<IMainProps> = () => {
 
   // 供 Sidebar 调用，触发 Welcome 的 handleChat
   const handleWelcomeChat = () => {
-  
+    welcomeRef.current?.handleChat()
   }
 
   const renderSidebar = () => {
@@ -822,7 +822,7 @@ const Main: FC<IMainProps> = () => {
               </div>
             )}
             {/* main */}
-            <div className='flex-grow flex flex-col h-[calc(100vh_-_1rem)] overflow-y-auto '>
+            <div className='flex-grow flex flex-col h-[calc(100vh_-_3rem)] overflow-y-auto chat-bg'>
               <ConfigSence
                 conversationName={conversationName}
                 hasSetInputs={hasSetInputs}
