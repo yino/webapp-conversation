@@ -37,7 +37,7 @@ const Chat: FC<IChatProps> = ({
   isHideSendInput = false,
   onFeedback,
   checkCanSend,
-  onSend = () => { },
+  onSend = () => {},
   useCurrentUserAvatar,
   isResponding,
   controlClearQuery,
@@ -51,6 +51,8 @@ const Chat: FC<IChatProps> = ({
   const [query, setQuery] = React.useState('')
   const queryRef = useRef('')
   const welcomeRef = useRef<HTMLDivElement>(null)
+  // 用于自动滚动到底部的哨兵元素
+  const bottomRef = useRef<HTMLDivElement>(null)
 
   const handleContentChange = (e: any) => {
     const value = e.target.value
@@ -89,17 +91,18 @@ const Chat: FC<IChatProps> = ({
   } = useImageFiles()
 
   const handleSend = () => {
-    if (!valid() || (checkCanSend && !checkCanSend()))
-      return
-    onSend(queryRef.current, files.filter(file => file.progress !== -1).map(fileItem => ({
-      type: 'image',
-      transfer_method: fileItem.type,
-      url: fileItem.url,
-      upload_file_id: fileItem.fileId,
-    })))
+    if (!valid() || (checkCanSend && !checkCanSend())) return
+    onSend(
+      queryRef.current,
+      files.filter(file => file.progress !== -1).map(fileItem => ({
+        type: 'image',
+        transfer_method: fileItem.type,
+        url: fileItem.url,
+        upload_file_id: fileItem.fileId,
+      })),
+    )
     if (!files.find(item => item.type === TransferMethod.local_file && !item.fileId)) {
-      if (files.length)
-        onClear()
+      if (files.length) onClear()
       if (!isResponding) {
         setQuery('')
         queryRef.current = ''
@@ -110,8 +113,7 @@ const Chat: FC<IChatProps> = ({
   const handleKeyUp = (e: any) => {
     if (e.code === 'Enter') {
       e.preventDefault()
-      if (!e.shiftKey && !isUseInputMethod.current)
-        handleSend()
+      if (!e.shiftKey && !isUseInputMethod.current) handleSend()
     }
   }
 
@@ -131,113 +133,95 @@ const Chat: FC<IChatProps> = ({
     handleSend()
   }
 
+  // 隐藏欢迎语
   useEffect(() => {
     if (chatList.length > 0 && welcomeRef.current) {
       welcomeRef.current.style.display = 'none'
     }
   }, [chatList])
 
+  // 监听 chatList 变化，滚动到底部
+  useEffect(() => {
+    if (bottomRef.current) {
+      bottomRef.current.scrollIntoView({ behavior: 'smooth' })
+    }
+  }, [chatList])
+
   return (
     <div className={cn(!feedbackDisabled && 'px-3.5', 'h-full w-full overflow-x-hidden')}>
       {/* Chat List */}
-      {/* PC */}
-   
       {chatList.length === 0 && !isMobile ? (
-        <div className='absolute bottom-20' style={{ width: "100%" }}>
-          <div className='flex justify-around items-center py-2 text-xl font-medium text-gray-700 text-center bottom-10
-'>{t('app.common.welcome')}</div>
-          <div className='flex justify-around items-center py-2 text-[0.8rem] font-medium text-gray-700  text-center'>{t('app.common.welcomeDesc')}</div>
+        <div className='absolute bottom-20' style={{ width: '100%' }}>
+          <div className='flex justify-around items-center py-2 text-xl font-medium text-gray-700 text-center'>
+            {t('app.common.welcome')}
+          </div>
+          <div className='flex justify-around items-center py-2 text-[0.8rem] font-medium text-gray-700 text-center'>
+            {t('app.common.welcomeDesc')}
+          </div>
         </div>
       ) : isMobile ? (
-        <div className="h-full w-full space-y-[30px] overflow-y-auto overflow-x-hidden">
+        <div className='h-full w-full space-y-[30px] overflow-y-auto overflow-x-hidden'>
           {chatList.length === 0 && showWelcome && (
             <>
-             <div ref={welcomeRef} className="flex flex-col items-center justify-center h-full text-center">
-               <h1 className="text-xl font-bold text-green-500 mb-5">您好，我是MandLab，您随身的<br/>绿色金融与ESG工作智能助手</h1>
-               <p className="text-gray-500 mb-8">我还在努力学习成长中，目前的我可以为您解答<br />ESG报告框架和关键议题方案问题</p>
-             </div>
-             {/* <div className="mb-5">
-                <p className="text-gray-500 mb-3">您可以问我这些问题：</p>
-                <div className="space-y-2">
-                  <button
-                    onClick={() => suggestionClick('最近有什么ESG相关政策')}
-                    className="w-full text-left text-gray-400 bg-gray-50 rounded p-2"
-                  >
-                    最近有什么ESG相关政策
-                  </button>
-                  <button
-                    onClick={() => suggestionClick('最近有什么绿色金融相关政策')}
-                    className="w-full text-left text-gray-400 bg-gray-50 rounded p-2"
-                  >
-                    最近有什么绿色金融相关政策
-                  </button>
-                  <button
-                    onClick={() => suggestionClick('关于最近出台的《绿色金融****》政策你怎么看')}
-                    className="w-full text-left text-gray-400 bg-gray-50 rounded p-2"
-                  >
-                    关于最近出台的《绿色金融****》政策你怎么看
-                  </button>
-                </div>
-              </div>*/}
+              <div ref={welcomeRef} className='flex flex-col items-center justify-center h-full text-center'>
+                <h1 className='text-xl font-bold text-green-500 mb-5'>您好，我是MandLab，您随身的<br/>绿色金融与ESG工作智能助手</h1>
+                <p className='text-gray-500 mb-8'>我还在努力学习成长中，目前的我可以为您解答<br/>ESG报告框架和关键议题方案问题</p>
+              </div>
             </>
           )}
-          {chatList.map((item) => {
-            if (item.isAnswer) {
-              const isLast = item.id === chatList[chatList.length - 1].id
-              return <Answer
+          {chatList.map(item =>
+            item.isAnswer ? (
+              <Answer
                 key={item.id}
                 item={item}
                 feedbackDisabled={feedbackDisabled}
                 onFeedback={onFeedback}
-                isResponding={isResponding && isLast}
+                isResponding={isResponding && item.id === chatList[chatList.length - 1].id}
                 suggestionClick={suggestionClick}
               />
-            }
-            return (
+            ) : (
               <Question
                 key={item.id}
                 id={item.id}
                 content={item.content}
                 useCurrentUserAvatar={useCurrentUserAvatar}
-                imgSrcs={(item.message_files && item.message_files?.length > 0)
-                  ? item.message_files.map(file => file.url)
-                  : []
-                }
+                imgSrcs={(item.message_files || []).map(f => f.url)}
               />
-            )
-          })}
+            ),
+          )}
+          {/* 哨兵元素，滚动时定位 */}
+          <div ref={bottomRef} />
         </div>
       ) : (
-        <div className="h-full space-y-[30px]">
-       
-          {chatList.map((item) => {
-            if (item.isAnswer) {
-              const isLast = item.id === chatList[chatList.length - 1].id
-              return <Answer
+        <div className='h-full space-y-[30px] overflow-y-auto'>
+          {chatList.map(item =>
+            item.isAnswer ? (
+              <Answer
                 key={item.id}
                 item={item}
                 feedbackDisabled={feedbackDisabled}
                 onFeedback={onFeedback}
-                isResponding={isResponding && isLast}
+                isResponding={isResponding && item.id === chatList[chatList.length - 1].id}
                 suggestionClick={suggestionClick}
               />
-            }
-            return (
+            ) : (
               <Question
                 key={item.id}
                 id={item.id}
                 content={item.content}
                 useCurrentUserAvatar={useCurrentUserAvatar}
-                imgSrcs={(item.message_files && item.message_files?.length > 0) ? item.message_files.map(item => item.url) : []}
+                imgSrcs={(item.message_files || []).map(f => f.url)}
               />
-            )
-          })}
+            ),
+          )}
+          <div ref={bottomRef} />
         </div>
       )}
 
+      {/* 发送区域 */}
       {!isHideSendInput && (
         <div className={cn(!feedbackDisabled && '!left-3.5 !right-3.5', 'absolute z-10 bottom-0 left-0 right-0')}>
-<div className='p-[5.5px] max-h-[150px] bg-white border-[1.5px] border-gray-200 rounded-xl overflow-y-auto'>
+          <div className='p-[5.5px] max-h-[150px] bg-white border-[1.5px] border-gray-200 rounded-xl overflow-y-auto'>
             {visionConfig?.enabled && (
               <>
                 <div className='absolute bottom-2 left-2 flex items-center'>
@@ -259,25 +243,16 @@ const Chat: FC<IChatProps> = ({
                 </div>
               </>
             )}
-          <Textarea
-              className={`
-              block w-full px-2 pr-[118px] py-[7px] leading-5 max-h-none text-sm text-gray-700 outline-none appearance-none resize-none
-              ${visionConfig?.enabled && 'pl-12'}
-             font-size: 16px !important;  
-                -webkit-text-size-adjust: 100%;  
-                -webkit-fill-available;  `}
-                 style={{ 
-                    fontSize: '16px', 
-                    WebkitTextSizeAdjust: '100%' 
-                  }}
+            <Textarea
+              className={`block w-full px-2 pr-[118px] py-[7px] leading-5 max-h-none text-sm text-gray-700 outline-none appearance-none resize-none ${visionConfig?.enabled && 'pl-12'} font-size: 16px !important; -webkit-text-size-adjust: 100%; -webkit-fill-available;`}
+              style={{ fontSize: '16px', WebkitTextSizeAdjust: '100%' }}
               value={query}
               onChange={handleContentChange}
               onKeyUp={handleKeyUp}
               onKeyDown={handleKeyDown}
               autoSize
             />
-            <div className="absolute bottom-2 right-2 flex items-center h-8">
-
+            <div className='absolute bottom-2 right-2 flex items-center h-8'>
               <Tooltip
                 selector='send-tip'
                 htmlContent={
