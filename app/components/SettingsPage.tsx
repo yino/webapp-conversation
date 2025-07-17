@@ -71,8 +71,11 @@ useEffect(() => {
   const confirmLogout = () => {
     // 清除登录凭证
     localStorage.removeItem('login_token')
-    // 跳转到登录页
+    // 关闭当前页面并跳转到登录页
     window.location.href = process.env.NEXT_PUBLIC_LOGIN_URL || '/web';
+    // 关闭所有页面 
+    window.open('about:blank', '_self')
+    window.location.replace(process.env.NEXT_PUBLIC_LOGIN_URL || '/web')
   }
   
   const cancelLogout = () => {
