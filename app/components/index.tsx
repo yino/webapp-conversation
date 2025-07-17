@@ -576,7 +576,7 @@ const Main: FC<IMainProps> = () => {
           // })
           // setConversationList(newAllConversations as any)
         }
-        setConversationIdChangeBecauseOfNew(false)
+        // setConversationIdChangeBecauseOfNew(false)
         resetNewConversationInputs()
         setChatNotStarted()
         setCurrConversationId(tempNewConversationId, APP_ID, true)
