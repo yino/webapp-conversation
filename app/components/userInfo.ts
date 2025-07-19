@@ -5,8 +5,9 @@ export interface UserInfo {
   invite_code: string;
   remaining_seconds: number;
   remaining_time_text: string; // 新增字段：格式化后时间字符串
+  uuid: string;
 }
-
+const USER_UUID = `user_conversation_uuid`
 const getLoginToken = (): string | null => {
   return localStorage.getItem('login_token');
 };
@@ -57,7 +58,9 @@ export const fetchUserInfo = async (): Promise<UserInfo | null> => {
         invite_code: rawData.invite_code || '',
         remaining_seconds: rawData.remaining_seconds || 0,
         remaining_time_text: formatRemainingTime(rawData.remaining_seconds || 0),
+        uuid: rawData.uuid || '',
       };
+      setUUID(formatted.uuid)
       return formatted;
     } else {
       console.error('返回异常:', data);
@@ -67,4 +70,12 @@ export const fetchUserInfo = async (): Promise<UserInfo | null> => {
     console.error('请求失败:', error);
     return null;
   }
+};
+
+export const getUUID = (): string | null => {
+  return localStorage.getItem(USER_UUID) || '';
+};
+
+const setUUID = (uuid: string): void => {
+  localStorage.setItem(USER_UUID, uuid);
 };

@@ -32,7 +32,7 @@ import { isFirstChatSession, saveFristChatSession } from '@/hooks/use-chatSessio
 import SettingsPage from '@/app/components/SettingsPage'
 import { ChevronLeftIcon } from '@heroicons/react/20/solid'
 import UsageTimeWarning from '@/app/components/UsageTimeWarning.tsx';
-
+import { fetchUserInfo } from '@/app/components/userInfo.ts'
 // +++ 添加类型定义 +++
 type DisplayMode = 'chat' | 'settings';
 
@@ -277,6 +277,8 @@ const Main: FC<IMainProps> = () => {
     (async () => {
       // 获取会话列表相关
       try {
+        // 必须优先加载此方法；用于做相关的初始化信息缓存
+        await fetchUserInfo()
         // let [conversationData, appParams] = await Promise.all([fetchConversations(), fetchAppParams()])
         const [conversationData, appParams] = await Promise.all([getSessionList(), fetchAppParams()])
         // handle current conversation id

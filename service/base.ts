@@ -2,6 +2,7 @@ import { API_PREFIX } from '@/config'
 import Toast from '@/app/components/base/toast'
 import type { AnnotationReply, MessageEnd, MessageReplace, ThoughtItem } from '@/app/components/chat/type'
 import type { VisionFile } from '@/types/app'
+import { getUUID } from '@/app/components/userInfo.ts'
 
 const TIME_OUT = 100000
 
@@ -18,6 +19,7 @@ const baseOptions = {
   credentials: 'include', // always send cookies、HTTP Basic authentication.
   headers: new Headers({
     'Content-Type': ContentType.json,
+    'uuid': '', // 误删，此是用户信息的标识
   }),
   redirect: 'follow',
 }
@@ -249,6 +251,7 @@ const handleStream = (
 }
 
 const baseFetch = (url: string, fetchOptions: any, { needAllResponseContent }: IOtherOptions) => {
+  baseOptions.headers.set('uuid', getUUID() || ''); // 通过header 透传给next.js server
   const options = Object.assign({}, baseOptions, fetchOptions)
 
   const urlPrefix = API_PREFIX
