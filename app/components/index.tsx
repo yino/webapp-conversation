@@ -279,17 +279,17 @@ const Main: FC<IMainProps> = () => {
       try {
         // 必须优先加载此方法；用于做相关的初始化信息缓存
         await fetchUserInfo()
-        // let [conversationData, appParams] = await Promise.all([fetchConversations(), fetchAppParams()])
-        const [conversationData, appParams] = await Promise.all([getSessionList(), fetchAppParams()])
+        let [conversationData, appParams] = await Promise.all([fetchConversations(), fetchAppParams()])
         // handle current conversation id
-        // const { data: conversations, error } = conversationData as { data: ConversationItem[]; error: string }
-        // if (error) {
-        //   Toast.notify({ type: 'error', message: error })
-        //   throw new Error(error)
-        //   return
-        // }
+        const { data: conversations, error } = conversationData as { data: ConversationItem[]; error: string }
+        if (error) {
+          Toast.notify({ type: 'error', message: error })
+          throw new Error(error)
+          return
+        }
         // 新的会话列表
-        const conversations: ConversationItem[] = afterGetSessionList(conversationData)?.data
+        // const [conversationData, appParams] = await Promise.all([getSessionList(), fetchAppParams()])
+        // const conversations: ConversationItem[] = afterGetSessionList(conversationData)?.data
 
         const _conversationId = getConversationIdFromStorage(APP_ID)
         const currentConversation = conversations.find(item => item.id === _conversationId)
@@ -494,61 +494,61 @@ const Main: FC<IMainProps> = () => {
         }
         if (isFirstMessage && newConversationId) {
           tempNewConversationId = newConversationId
-          // 客户端是否已缓存会话 若缓存则无需绑定
-          const handleSessionBinding = async (newConversationId) => {
-            try {
-              await getChatSession(newConversationId);
-              saveFristChatSession(newConversationId);
-              return;
-            } catch (error) {
-              if (error.response?.data?.code === 2001) {
-                startIntervalForNameGeneration(newConversationId);
-              }
-            }
-          };
-          // 定时获取会话名称 并绑定
-          const startIntervalForNameGeneration = (newConversationId) => {
-            intervalRef.current = setInterval(async () => {
-              await handleNameGeneration(newConversationId);
-            }, 3000);
-          };
-          // 获取逻辑
-          const handleNameGeneration = async (newConversationId) => {
-            if (isRequestPending.current) return;
-            isRequestPending.current = true;
-            try {
-              const newItem = await generationConversationName(newConversationId);
-              if (newItem.name) {
-                clearInterval(intervalRef.current);
-                intervalRef.current = null;
-                await handleSessionBindingAfterNameGeneration(newItem);
-              }
-            } catch (error) {
-              console.error("Request failed:", error);
-            } finally {
-              isRequestPending.current = false;
-            }
-          };
-          // 获取到名称后
-          const handleSessionBindingAfterNameGeneration = async (newItem) => {
-            await bindChatSession(newItem.id, newItem.name);
-            saveFristChatSession(newItem.id);
-            const conversationData = await getSessionList();
-            const allConversations: ConversationItem[] = afterGetSessionList(conversationData)?.data;
-            const newAllConversations = produce(allConversations, (draft: any) => {
-              draft[0].name = newItem.name;
-            });
-            setConversationList(newAllConversations as any);
-            setConversationIdChangeBecauseOfNew(false);
-            resetNewConversationInputs();
-            setChatNotStarted();
-            setCurrConversationId(tempNewConversationId, APP_ID, true);
-            setRespondingFalse();
-          };
-          // 执行上述逻辑
-          if (!isFirstChatSession(newConversationId)) {
-            handleSessionBinding(newConversationId);
-          }
+          // 新 - 客户端是否已缓存会话 若缓存则无需绑定
+          // const handleSessionBinding = async (newConversationId) => {
+          //   try {
+          //     await getChatSession(newConversationId);
+          //     saveFristChatSession(newConversationId);
+          //     return;
+          //   } catch (error) {
+          //     if (error.response?.data?.code === 2001) {
+          //       startIntervalForNameGeneration(newConversationId);
+          //     }
+          //   }
+          // };
+          // // 定时获取会话名称 并绑定
+          // const startIntervalForNameGeneration = (newConversationId) => {
+          //   intervalRef.current = setInterval(async () => {
+          //     await handleNameGeneration(newConversationId);
+          //   }, 3000);
+          // };
+          // // 获取逻辑
+          // const handleNameGeneration = async (newConversationId) => {
+          //   if (isRequestPending.current) return;
+          //   isRequestPending.current = true;
+          //   try {
+          //     const newItem = await generationConversationName(newConversationId);
+          //     if (newItem.name) {
+          //       clearInterval(intervalRef.current);
+          //       intervalRef.current = null;
+          //       await handleSessionBindingAfterNameGeneration(newItem);
+          //     }
+          //   } catch (error) {
+          //     console.error("Request failed:", error);
+          //   } finally {
+          //     isRequestPending.current = false;
+          //   }
+          // };
+          // // 获取到名称后
+          // const handleSessionBindingAfterNameGeneration = async (newItem) => {
+          //   await bindChatSession(newItem.id, newItem.name);
+          //   saveFristChatSession(newItem.id);
+          //   const conversationData = await getSessionList();
+          //   const allConversations: ConversationItem[] = afterGetSessionList(conversationData)?.data;
+          //   const newAllConversations = produce(allConversations, (draft: any) => {
+          //     draft[0].name = newItem.name;
+          //   });
+          //   setConversationList(newAllConversations as any);
+          //   setConversationIdChangeBecauseOfNew(false);
+          //   resetNewConversationInputs();
+          //   setChatNotStarted();
+          //   setCurrConversationId(tempNewConversationId, APP_ID, true);
+          //   setRespondingFalse();
+          // };
+          // // 执行上述逻辑
+          // if (!isFirstChatSession(newConversationId)) {
+          //   handleSessionBinding(newConversationId);
+          // }
         }
         setMessageTaskId(taskId)
         // has switched to other conversation
@@ -563,11 +563,13 @@ const Main: FC<IMainProps> = () => {
           questionItem,
         })
       },
+      // 新版
+      /**
+       * 
+       
       async onCompleted(hasError?: boolean) {
-        console.log("onCompleted")
         if (hasError)
           return
-        // 此处return 上游无法返回 conversationId
         if (getConversationIdChangeBecauseOfNew()) {
           // const { data: allConversations }: any = await fetchConversations()
           // const newItem: any = await generationConversationName(allConversations[0].id);
@@ -579,6 +581,27 @@ const Main: FC<IMainProps> = () => {
           // setConversationList(newAllConversations as any)
         }
         // setConversationIdChangeBecauseOfNew(false)
+        resetNewConversationInputs()
+        setChatNotStarted()
+        setCurrConversationId(tempNewConversationId, APP_ID, true)
+        setRespondingFalse()
+      },
+      */
+      async onCompleted(hasError?: boolean) {
+        console.log("onCompleted")
+        if (hasError)
+          return
+
+        if (getConversationIdChangeBecauseOfNew()) {
+          const { data: allConversations }: any = await fetchConversations()
+          const newItem: any = await generationConversationName(allConversations[0].id)
+
+          const newAllConversations = produce(allConversations, (draft: any) => {
+            draft[0].name = newItem.name
+          })
+          setConversationList(newAllConversations as any)
+        }
+        setConversationIdChangeBecauseOfNew(false)
         resetNewConversationInputs()
         setChatNotStarted()
         setCurrConversationId(tempNewConversationId, APP_ID, true)
